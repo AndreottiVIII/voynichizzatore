@@ -1,2 +1,4 @@
 * text eol=lf
 *.json text eol=lf
+*.ttf binary
+*.pdf binary
