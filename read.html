@@ -31,8 +31,9 @@
           <label class="drop" id="drop">
             <input type="file" id="file" accept=".txt,text/plain">
             <strong>Choose the .txt file</strong> or drop it here<br>
-            <span class="note" id="file-name">The PDF cannot be read back: use the text file.</span>
+            <span class="note" id="file-name">The .txt file you kept when the book was written (the PDF cannot be read back).</span>
           </label>
+          <p class="file-status" id="file-status" aria-live="polite"></p>
           <details>
             <summary>Or paste the manuscript</summary>
             <textarea id="pasted" spellcheck="false" placeholder="@<f1r.1> tolshdar.shekaiin.daldy…"></textarea>
@@ -62,6 +63,7 @@
 
       <section id="result" hidden>
         <h2>The text</h2>
+        <p class="file-status ok" id="verified"></p>
         <textarea id="output" class="output" readonly></textarea>
         <details class="tech">
           <summary>Technical details</summary>

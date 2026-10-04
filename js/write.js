@@ -33,7 +33,7 @@ async function deskFolio(page) {
   deskShown = page;
   deskTime = now;
   $('desk-img').src = 'img/folios/' + page + '.jpg';
-  $('desk-cap').textContent = 'the real ' + page;
+  $('desk-cap').textContent = page;
   $('desk-real').hidden = false;
 }
 async function realFolio(page) {
@@ -42,10 +42,9 @@ async function realFolio(page) {
   $('real').hidden = !f;
   if (!f) return;
   $('real-img').src = 'img/folios/' + page + '.jpg';
-  $('real-img').alt = 'The real folio ' + page + ' of the Voynich manuscript';
+  $('real-img').alt = 'Folio ' + page + ' of the Voynich manuscript (Beinecke MS 408)';
   $('real-link').href = YALE + f[1];
-  $('real-cap').textContent = 'The real ' + page + (f[0].replace(/\s+/g, '') !== page.slice(1) ? ' (photograph: ' + f[0] + ')' : '') +
-    ' · Beinecke MS 408, Yale University Library';
+  $('real-cap').textContent = page;
 }
 
 // Start fetching Python as soon as someone begins to write: by the time they press the button, it is ready.

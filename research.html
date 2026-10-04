@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Voynichizer · Research</title>
-<meta name="description" content="Research on the Voynich manuscript behind the Voynichizer.">
+<meta name="description" content="The Voynich Manuscript as a Writing System: reproducible measurements against natural languages, medieval scribes, historical ciphers and text generators. Preprint, version 1.">
 <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
@@ -15,19 +15,71 @@
   </nav>
 </header>
 
-<main class="folio">
+<main class="folio prose">
   <div class="folio-no">2v</div>
+  <div class="spread">
+  <div class="text">
   <span class="tag" aria-hidden="true">shedy.qokedy</span>
-  <h1>Research</h1>
-  <p class="soon">Coming soon.</p>
-  <figure class="illus" style="max-width:380px;margin:0 auto">
-      <img src="img/bath-f75r.jpg" width="440" height="765" alt="Women bathing in a green pool, from the balneological section of the Voynich manuscript">
-      <figcaption>Beinecke MS 408, f. 75r</figcaption>
-    </figure>
+  <h1>The Voynich Manuscript as a Writing System</h1>
+  <p class="subtitle">Reproducible measurements against natural languages, medieval scribes, historical ciphers and text
+    generators</p>
+  <p class="byline">Davide Caniatti <span class="aff">(independent researcher)</span> and Claude
+    <span class="aff">(Anthropic)</span><br>
+    <span class="note">Contributors: Andrea Lanterna (computational setup), Giulia Gandellini (support).
+    Preprint, version 1, October 2026. Not peer reviewed.</span></p>
+
+  <div class="download paper">
+    <div><strong>The paper</strong><p class="note">PDF, 167 KB, in English.</p></div>
+    <a class="btn" href="research/Caniatti_Claude_2026_Voynich_writing_system_v1.pdf" download>Download the PDF</a>
+  </div>
+
+  <h2>Abstract</h2>
+  <div class="abstract">
+    <p>The Voynich manuscript (Yale, Beinecke MS 408) is written in a script that has never been read. We do not propose a decipherment. Instead, we describe <em>how</em> the text is written, using more than six hundred preregistered, reproducible experiments, each first validated on synthetic texts in which the effect is known to be present or absent, and replicated on three independent transliterations. We then compare every property with the same measurement on about one hundred natural languages, eight constructed languages, handwritten gibberish produced by volunteers, published Voynich-like generators and ciphers, the eighteenth-century Copiale cipher, and—for the first time in a systematic way—79 real medieval scribes: six Nordic manuscripts (c. 1200–1550) and 73 German manuscripts (1350–1500) transcribed at the level of letter forms, with their original lines and pages.</p>
+    <p><strong>New findings.</strong> (1) The text behaves as a <em>chain of glyphs</em> in which the space is a weak boundary: spaces are predictable from the two surrounding glyphs, re-cutting the chain at other permitted points mostly yields words attested elsewhere, and the rules linking the end of one word to the start of the next mirror the rules inside words more than in any of 71 languages. (2) Adjacent words are linked by <em>junction rules</em> (<code class="eva">qo-</code> after <code class="eva">-y/-o/-d</code>, <code class="eva">o-</code> after <code class="eva">-n/-r/-s/-m</code>; <code class="eva">-l/-r</code> chosen by the next word), applied while writing and looking exactly one word ahead. (3) The <em>line is a closed unit</em>: the junction stops at the line break and at the gap left by a drawing, and line starts and ends have their own forms. (4) The scribe <em>copies from the line immediately above</em>, adapting the copies to the junction rules. (5) Each line <em>avoids starting like the line above</em>. (6) Binary choices between variant forms (<code class="eva">k/t</code>, <code class="eva">sh/ch</code>, <code class="eva">-ey/-dy</code>) follow a <em>short-lived state</em> that persists for two to three words regardless of which word is written; it is not copying, not position, separate for each choice, and identical across scribal hands—a rule of the system. (7) Marked variants <em>drift</em> towards simpler forms along the line. Two further properties are quantified anew: immediate repetition of the previous word (1.0% of adjacent pairs; 3.9% with one glyph changed) and a strong page, bifolium and paragraph structure.</p>
+    <p><strong>Comparisons.</strong> Junction rules, left-margin avoidance, line-edge forms, in-line drift and immediate repetition have no counterpart in the 79 scribes (they are absent or three to a hundred times weaker), and the short state of the choices was found in none of them in the Voynich's form; the Copiale copyist does the opposite of the Voynich, rotating homophones between adjacent words. A slower state crossing line breaks, by contrast, is normal in real scribes. No substitution reading in tens of languages, none of the published readings we could test (Bax, Vatne, Cheshire, Schechter, Gatta), none of the simulated historical mechanisms (homophone choice, Alberti's index letters, Bacon's biliteral cipher, Trithemius' word tables, a line-restarting autokey), no constructed language and no published generator reproduces these properties together.</p>
+    <p><strong>Conclusion.</strong> The Voynich text is the product of a writing system with rules between neighbouring words and at line edges far stronger than those of any scribe, language or generator we tested. These rules do not reveal what the text says, but they exclude many explanations and provide a checklist that any future proposal must reproduce.</p>
+  </div>
+
+  <h2>Key findings</h2>
+  <p>The first seven findings are, to our knowledge, <strong>new</strong>; the last three strengthen earlier ideas with new measurements.</p>
+  <ol class="findings">
+    <li><strong>The text is a chain of glyphs in which the space is a weak boundary.</strong> The rules linking the last glyph of a word to the first glyph of the next mirror the rules between two glyphs inside a word more than in any of 71 comparison languages. Spaces can be predicted from the two surrounding glyphs (accuracy 0.86, above 97% of languages), and cutting the text at other points allowed by the rules mostly yields words attested elsewhere in the manuscript (50%, against 6.5% in languages).</li>
+    <li><strong>Adjacent words are linked by junction rules.</strong> <code class="eva">qo-</code> follows words ending in <code class="eva">-y</code>, <code class="eva">-o</code>, <code class="eva">-d</code>; <code class="eva">o-</code> follows <code class="eva">-n</code>, <code class="eva">-r</code>, <code class="eva">-s</code>, <code class="eva">-m</code>. A final <code class="eva">-l</code> or <code class="eva">-r</code> depends on how the next word begins. The scribe <em>knows the next word</em> while finishing the current one. The link is about four times stronger than in the strongest of the medieval scribes we tested.</li>
+    <li><strong>The line is a closed unit.</strong> The link between words stops at the line break and also where a drawing interrupts the line; line starts and ends have their own forms (at line end <code class="eva">-m</code> replaces <code class="eva">-r</code>; at line start <code class="eva">s-</code> and <code class="eva">y-</code> appear).</li>
+    <li><strong>The scribe copies from the line immediately above.</strong> Words reproduce, more than chance, words or pieces of line from the line just written, not from lines further up; the copy is adapted to the junction rules with its new neighbour.</li>
+    <li><strong>Each line avoids starting like the line above.</strong> If the line above begins with <code class="eva">qo-</code>, the line below begins with <code class="eva">o-</code>. None of 79 medieval scribes does this: not a single case in 72 tests on the six Nordic scribes, and only three of 73 German manuscripts avoid one single initial, as expected by chance.</li>
+    <li><strong>Choices between variant forms follow a “state” lasting a few words.</strong> Between the forms <code class="eva">k/t</code>, <code class="eva">sh/ch</code>, <code class="eva">-ey/-dy</code>, the scribe tends to repeat the same choice for two or three words, <em>whatever word is being written</em>. It is not copying of similar words, not position in the line, it is separate for each choice and identical in all the hands of the manuscript: a rule of the writing system. We did not find it in any of the 79 medieval scribes (six Nordic, 73 German) nor in the Copiale copyist.</li>
+    <li><strong>Marked variants drift along the line</strong> (<code class="eva">qo</code>, <code class="eva">k</code>, <code class="eva">sh</code>, <code class="eva">-ey</code> become rarer from left to right), three to fifteen times more than in the six Nordic scribes and about four times more than in the 73 German ones, whose small drifts follow no common direction.</li>
+    <li><strong>The Voynich repeats the previous word immediately</strong> (1.0% of adjacent pairs) or a nearly identical one (3.9%), more than every language and every one of the 85 handwritten texts we tested (usually 10 to 100 times more), while having a vocabulary of normal size.</li>
+    <li><strong>The book has a writing structure</strong>: each page has a strong identity, the bifolium is a working unit (one Currier “language” and almost always one hand), the paragraph opens with a large sign (<code class="eva">p</code>) and has first and last lines with their own register; <code class="eva">-ey</code> increases down the page.</li>
+    <li><strong>No proposed reading survives the controls</strong>: neither ours (substitutions in dozens of languages, solvers, verbose ciphers, nomenclators, content-guided searches) nor the published ones we could test (Bax, Vatne, Cheshire, Schechter, Gatta), nor the historical cipher mechanisms we simulated (homophones, Alberti's index, Bacon's biliteral cipher, Trithemius' word lists, autokey).</li>
+  </ol>
+
+  <h2>The research and the Voynichizer</h2>
+  <p>The Voynichizer grew out of this research. Its generator writes by the regularities the paper measures (the
+    vocabulary of each section, the shape of the words, the edges of the lines, the links between neighbouring words,
+    the line copied from the line above) and is judged by the same statistics; <a href="how.html#second">How it works</a>
+    lists them one by one, with how close the generated book comes. Like the paper, it reads nothing in the Voynich:
+    it imitates how the text is written, not what it says.</p>
+
+  <h2>How to cite</h2>
+  <p class="cite">Caniatti, D., &amp; Claude (2026). <em>The Voynich Manuscript as a Writing System: Reproducible
+    measurements against natural languages, medieval scribes, historical ciphers and text generators.</em> Preprint,
+    version 1.</p>
+  </div>
+    <div class="side">
+      <figure class="illus">
+        <img src="img/bath-f75r.jpg" width="440" height="765" alt="Women bathing in a green pool, from the balneological section of the Voynich manuscript">
+        <figcaption>Beinecke MS 408, f. 75r</figcaption>
+      </figure>
+    </div>
+  </div>
 </main>
 
 <a class="totop" href="#top" aria-label="Back to the top" hidden>↑</a>
 <script src="js/top.js" defer></script>
+<script src="js/margins.js" defer></script>
 
 <footer class="colophon">
   Voynichizer v21, by Davide Caniatti, 2026 · it runs entirely in your browser · drawings from Beinecke MS 408, Yale University ·

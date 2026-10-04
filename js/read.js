@@ -1,6 +1,7 @@
 // The Read page: manuscript file and key in, text out.
 import { prepare, call } from './engine.js';
 import { $, showKey, error, LOADING, explain } from './common.js';
+import { parseManuscript } from './glyphs.js';
 
 const PAGES = 207;
 const MAX_BYTES = 2 * 1024 * 1024;       // a manuscript weighs about 260 KB
@@ -11,14 +12,34 @@ showKey($('show-key'), $('key'));
 const warm = () => prepare().catch(() => {});
 $('key').addEventListener('focus', warm, { once: true });
 
+// What the chosen file contains, said at once: a manuscript (how many folios and lines) or not
+function check(text, name) {
+  const pages = parseManuscript(text || '');
+  const lines = pages.reduce((n, p) => n + p.lines.length, 0);
+  const status = $('file-status');
+  if (!pages.length) {
+    status.className = 'file-status bad';
+    status.textContent = (name ? name + ': ' : '') + 'this does not look like a manuscript of the Voynichizer ' +
+      '(no lines such as <f1r.1> words.separated.by.dots).';
+    return false;
+  }
+  status.className = 'file-status ok';
+  status.textContent = '✓ ' + (name ? name + ': ' : 'Pasted text: ') + 'a manuscript of ' + pages.length + ' folios and ' +
+    lines.toLocaleString('en') + ' lines' + (pages.length === PAGES ? '' : ' (a whole book has ' + PAGES + ' folios: some are missing)') +
+    '. Now give its key.';
+  return true;
+}
+
 async function take(file) {
   if (!file) return;
-  if (file.size > MAX_BYTES) { loaded = null; $('file-name').textContent = 'This file is too big to be a manuscript.'; return; }
-  if (/\.pdf$/i.test(file.name)) { loaded = null; $('file-name').textContent = 'This is the PDF: it cannot be read back. Choose the .txt file.'; return; }
+  const status = $('file-status');
+  if (file.size > MAX_BYTES) { loaded = null; status.className = 'file-status bad'; status.textContent = file.name + ': too big to be a manuscript.'; return; }
+  if (/\.pdf$/i.test(file.name)) { loaded = null; status.className = 'file-status bad'; status.textContent = file.name + ': this is the PDF, which cannot be read back. Choose the .txt file with the same name.'; return; }
   loaded = await file.text();
-  $('file-name').textContent = file.name + ' · ' + Math.round(file.size / 1024) + ' KB';
+  if (!check(loaded, file.name)) loaded = null;
   warm();
 }
+$('pasted').addEventListener('input', () => { if ($('pasted').value.trim()) check($('pasted').value, ''); });
 $('file').addEventListener('change', () => take($('file').files[0]));
 const drop = $('drop');
 drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
@@ -48,6 +69,9 @@ $('form').addEventListener('submit', async (e) => {
       $('meta').textContent = 'Folio ' + Math.min(n, PAGES) + ' of ' + PAGES;
     });
     $('output').value = out.text;
+    $('verified').textContent = '✓ The text came back intact: ' + [...out.text].length.toLocaleString('en') +
+      ' characters. The key opened the message, its length matched and its 64-bit authentication tag matched: ' +
+      'this is exactly the text that was hidden, letter for letter.';
     technical(out.text, manuscript, info, performance.now() - t1);
     if (textUrl) URL.revokeObjectURL(textUrl);
     textUrl = URL.createObjectURL(new Blob([out.text], { type: 'text/plain' }));
