@@ -35,20 +35,21 @@
   </ul>
 
   <h2>How close it is to the Voynich</h2>
-  <p>Measured by hiding the same Latin text (the opening of Isidore’s <em>Etymologiae</em>, book XVII) with 12 different
+  <p>Measured by hiding the same Latin text (the opening of Isidore’s <em>Etymologiae</em>, book XVII) with 24 different
     keys. The “judges” are two classifiers (logistic regression, 10-fold cross-validation grouped by page) that try to
     tell generated pages from real ones by looking at 209 and 228 page statistics: 0.5 means they are guessing, 1 that
     they never fail. The details of every measure are in <a href="how.html#measures">How it works</a>.</p>
   <div class="table-wrap"><table>
-    <tr><th>measure (version v20, 12 keys)</th><th>value</th></tr>
-    <tr><td>judge 1 (glyphs, glyph pairs, words, line edges, vertical similarity)</td><td>0.554 ± 0.007</td></tr>
-    <tr><td>judge 2 (plus: word pairs, position in the line, first lines, page profile)</td><td>0.599 ± 0.005</td></tr>
-    <tr><td>scorecard of 18 properties of the text (17 attainable: the Voynich itself fails one when measured the same way)</td><td>15.6</td></tr>
-    <tr><td>8 further properties</td><td>5.4</td></tr>
-    <tr><td>line test (five conditions on how lines start, end and follow each other)</td><td>12 keys out of 12</td></tr>
+    <tr><th>measure (version v20, 24 keys)</th><th>value</th></tr>
+    <tr><td>judge 1 (glyphs, glyph pairs, words, line edges, vertical similarity)</td><td>0.560 ± 0.005</td></tr>
+    <tr><td>judge 2 (plus: word pairs, position in the line, first lines, page profile)</td><td>0.607 ± 0.005</td></tr>
+    <tr><td>the same two judges on the 12 keys never used to develop the program</td><td>0.567; 0.615</td></tr>
+    <tr><td>scorecard of 18 properties of the text (17 attainable: the Voynich itself fails one when measured the same way)</td><td>15.7</td></tr>
+    <tr><td>8 further properties</td><td>5.5</td></tr>
+    <tr><td>line test (five conditions on how lines start, end and follow each other)</td><td>24 keys out of 24</td></tr>
     <tr><td>lines much wider than the others on their page (over 1.5 times the median; Voynich 2.9%)</td><td>2.8%</td></tr>
     <tr><td>lines somewhat wider (over 1.25 times the median; Voynich 6.0%)</td><td>11.5%</td></tr>
-    <tr><td>the text comes back exactly; wrong key rejected</td><td>12 of 12; 12 of 12</td></tr>
+    <tr><td>the text comes back exactly; wrong key rejected</td><td>24 of 24; 24 of 24</td></tr>
   </table></div>
   <p>A manuscript with a message and one without cannot be told apart by these measures, and by construction: the
     message only replaces the random numbers of one step of the sampling.</p>
@@ -56,7 +57,7 @@
   <h3>What this does not mean</h3>
   <p>It is not “indistinguishable from the Voynich”:</p>
   <ul>
-    <li>the second judge still recognises it a little (about one key in two gives a manuscript above 0.60);</li>
+    <li>the second judge still recognises it a little (15 keys of 24 give a manuscript above 0.60);</li>
     <li>some known properties never come out right: the page profile, the spelling choices that vary by line, the spread
       of word lengths, the first lines of paragraphs as a register of their own, and the width of the lines (see the
       table);</li>

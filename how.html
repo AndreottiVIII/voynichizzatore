@@ -63,8 +63,8 @@
   <h2 id="second">A second Voynich: what it has in common with the real one</h2>
   <p>The aim is a book that could stand beside MS 408 as another copy of the same kind of text: not a translation, not
     a collage of real pages, but new pages written by the same rules. Each property below is a regularity of the real
-    manuscript; the second column says how the program reproduces it, the third how close it comes (12 keys, version
-    v20; the measures are described <a href="#measures">below</a>).</p>
+    manuscript; the second column says how the program reproduces it, the third how close it comes (version v20, keys 1–12; the
+    measures are described <a href="#measures">below</a>).</p>
   <div class="table-wrap"><table>
     <tr><th>property of the Voynich</th><th>how the program reproduces it</th><th>measured</th></tr>
     <tr><td>207 folios with running text, in seven sections (herbal, recipes, biological, pharmaceutical, …) and two
@@ -96,10 +96,11 @@
     <tr><td>spelling choices vary from line to line; the page profile by position in the word</td><td>partly (agreement
       terms in the arrangement)</td><td>not reproduced: missed in 12 keys of 12</td></tr>
   </table></div>
-  <p>Taken together: the judges score 0.554 and 0.599 against the 0.5 of pure chance, below the threshold of 0.6 that the
-    research set in advance for “indistinguishable”; but the second judge exceeds 0.6 with about half of the keys, the
-    judges were built by us, and a few properties are still missed. The second Voynich is close, not identical, and
-    this page says exactly where it differs.</p>
+  <p>Taken together: over 24 keys the judges score 0.560 and 0.607, against the 0.5 of pure chance. On the 12 keys
+    used while the program was being developed both stay below the threshold of 0.6 that the research set in advance for
+    “indistinguishable” (0.554 and 0.599); on 12 fresh keys, never used for any choice, the second judge is just above
+    it (0.615). The judges were built by us, and a few properties are still missed. The second Voynich is close, not
+    identical, and this page says exactly where it differs.</p>
 
   <!-- ============================================================ -->
   <h2 id="overview">Overview of the program</h2>
@@ -382,7 +383,9 @@
     <tr><td>similarity with the word in the same position in the line above (1 − normalised Levenshtein)</td><td>0.152</td></tr>
     <tr><td>first glyph of a line equal to the first glyph of the line above (the Voynich avoids it)</td><td>−0.948</td></tr>
     <tr><td>similarity of words two places apart in a line</td><td>0.300</td></tr>
-    <tr><td>spelling choices agreeing within a line; with the line above</td><td>0.044; 0.048</td></tr>
+    <tr><td>spelling choices agreeing within a line; with the line above (known defect of v12–v20: the counts of the
+      choices start from zero instead of from the page, so the term follows the swaps made rather than the lines;
+      corrected in the next version)</td><td>0.044; 0.048</td></tr>
     <tr><td>difference in glyph content between the two halves of the page (Σ of squared differences / glyphs)</td><td>1.103</td></tr>
     <tr><td>line widths in characters: squared deviation from the expected width (new in v20)</td><td>−0.01</td></tr>
   </table></div>
@@ -494,7 +497,8 @@
     properties and a test of the line structure. They were built during the research and are not part of the program;
     their code is in the private research repository. The measurements hide the same Latin text (the opening of
     Isidore’s <em>Etymologiae</em>, book XVII, about 1,668 words, 38,304 bits once compressed and encrypted) with
-    12 keys, and report the mean over the keys.</p>
+    24 keys: keys 1–12 were also used while choosing between variants of the program, keys 13–24 never were, so the
+    second set is the fairer estimate. Results are means over the keys, with their standard errors.</p>
 
   <h3>The two judges</h3>
   <ul>
@@ -572,22 +576,24 @@
 
   <h3>Results</h3>
   <div class="table-wrap"><table>
-    <tr><th>measure (12 keys)</th><th>Voynich</th><th>v17</th><th>v20</th></tr>
-    <tr><td>judge 1 (e231), AUC</td><td>–</td><td>0.563 ± 0.008</td><td>0.554 ± 0.007</td></tr>
-    <tr><td>judge 2 (e266), AUC</td><td>–</td><td>0.601 ± 0.006</td><td>0.599 ± 0.005</td></tr>
-    <tr><td>scorecard (17 attainable)</td><td>17</td><td>15.0</td><td>15.6</td></tr>
-    <tr><td>further properties (of 8)</td><td>8</td><td>5.8</td><td>5.4</td></tr>
-    <tr><td>line test passed</td><td>yes</td><td>11 of 12 keys</td><td>12 of 12 keys</td></tr>
-    <tr><td>line test: S1; A; consecutive lines r</td><td>0.531; 1.047; 0.207</td><td>0.521; 1.009; 0.223</td><td>0.509; 1.034; 0.226</td></tr>
-    <tr><td>lines over 1.25 times the page median (characters)</td><td>6.0%</td><td>16.7%</td><td>11.5%</td></tr>
-    <tr><td>lines over 1.5 times the page median</td><td>2.9%</td><td>5.0%</td><td>2.8%</td></tr>
-    <tr><td>text back exactly; wrong key rejected</td><td>–</td><td>12 of 12; 12 of 12</td><td>12 of 12; 12 of 12</td></tr>
+    <tr><th>measure</th><th>Voynich</th><th>v17, keys 1–12</th><th>v20, keys 1–12</th><th>v20, keys 13–24 (fresh)</th><th>v20, all 24</th></tr>
+    <tr><td>judge 1 (e231), AUC</td><td>–</td><td>0.563 ± 0.008</td><td>0.554 ± 0.007</td><td>0.567 ± 0.006</td><td>0.560 ± 0.005</td></tr>
+    <tr><td>judge 2 (e266), AUC</td><td>–</td><td>0.601 ± 0.006</td><td>0.599 ± 0.005</td><td>0.615 ± 0.008</td><td>0.607 ± 0.005</td></tr>
+    <tr><td>keys with judge 2 above 0.60</td><td>–</td><td>–</td><td>7 of 12</td><td>8 of 12</td><td>15 of 24</td></tr>
+    <tr><td>scorecard (17 attainable)</td><td>17</td><td>15.0</td><td>15.6</td><td>15.8</td><td>15.7</td></tr>
+    <tr><td>further properties (of 8)</td><td>8</td><td>5.8</td><td>5.4</td><td>5.6</td><td>5.5</td></tr>
+    <tr><td>line test passed</td><td>yes</td><td>11 of 12</td><td>12 of 12</td><td>12 of 12</td><td>24 of 24</td></tr>
+    <tr><td>line test: S1; A; consecutive lines r</td><td>0.531; 1.047; 0.207</td><td>0.521; 1.009; 0.223</td><td>0.509; 1.034; 0.226</td><td>0.522; 1.032; 0.224</td><td>–</td></tr>
+    <tr><td>lines over 1.25 times the page median (characters)</td><td>6.0%</td><td>16.7%</td><td>11.5%</td><td>–</td><td>–</td></tr>
+    <tr><td>lines over 1.5 times the page median</td><td>2.9%</td><td>5.0%</td><td>2.8%</td><td>–</td><td>–</td></tr>
+    <tr><td>text back exactly; wrong key rejected</td><td>–</td><td>12; 12</td><td>12; 12</td><td>12; 12</td><td>24; 24</td></tr>
   </table></div>
-  <p>Properties v20 misses, with the number of keys that miss them: gradient (12, the Voynich misses it too), page
-    profile (12), spelling choices by line (12), spread of word lengths (9), first lines as a register (9), homogeneity (4),
-    repetition (1), rare words per page (1). The keys used for these numbers were also used to choose between variants
-    of the program, so the numbers are slightly optimistic; on 12 keys never used for choosing (measured for v14) the
-    judges gave 0.584 and 0.609 instead of 0.566 and 0.591.</p>
+  <p>Properties v20 misses, with the number of keys that miss them (keys 1–12 / 13–24): gradient (12 / 12, the Voynich
+    misses it too), page profile (12 / 12), spelling choices by line (12 / 12), spread of word lengths (9 / 11), first
+    lines as a register (9 / 6), homogeneity (4 / 2), repetition (1 / 0), rare words per page (1 / 0).</p>
+  <p>The judge-2 values of the single keys range from 0.565 to 0.689, the highest on a fresh key. On the fresh keys the
+    judges are about 0.015 higher than on the keys used during development: the expected optimism of keys that helped
+    choose the program.</p>
 
   <!-- ============================================================ -->
   <h2 id="security">Security</h2>
@@ -606,8 +612,10 @@
   <!-- ============================================================ -->
   <h2 id="limits">Known limits</h2>
   <ul>
-    <li>Not indistinguishable from the Voynich: the second judge still recognises the pages a little (about one key in two
-      above 0.60), and several properties never come out right (above).</li>
+    <li>Not indistinguishable from the Voynich: the second judge still recognises the pages a little (0.607 over 24 keys,
+      above 0.60 with 15 of them), and several properties never come out right (above).</li>
+    <li>A known defect of v12–v20 in the arrangement: the counts of the spelling choices used by two of its terms start
+      from zero. It does not affect reading (the arrangement carries no message) and is corrected in the next version.</li>
     <li>The judges and the scorecard are ours, and the model was tuned on the statistics they look at; a judge built
       independently has not been tried.</li>
     <li>Still too many lines somewhat wider than the others (11.5% over 1.25 times the median, Voynich 6.0%).</li>
@@ -631,7 +639,7 @@
     <tr><td>v13–v14</td><td>word bag refitted; plausible joins of words</td><td>0.566 / 0.591</td></tr>
     <tr><td>v15</td><td>encryption with scrypt, SHAKE-256 and HMAC</td><td>0.570 / 0.601</td></tr>
     <tr><td>v16–v17</td><td>page layout taken from another page (v16), then drawn from statistics (v17); first published</td><td>0.563 / 0.601</td></tr>
-    <tr><td>v18–v20</td><td>line widths in characters (v18–v19); alternation within the line restored (v20); published</td><td>0.554 / 0.599</td></tr>
+    <tr><td>v18–v20</td><td>line widths in characters (v18–v19); alternation within the line restored (v20); published</td><td>0.554 / 0.599 (24 keys: 0.560 / 0.607)</td></tr>
   </table></div>
 
   <!-- ============================================================ -->
