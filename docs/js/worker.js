@@ -3,7 +3,7 @@
 // Messages out: {id, type: 'progress'|'done'|'error', ...}
 import { scrypt } from './noble-hashes/scrypt.js';
 
-const VERSION = new URL(self.location.href).searchParams.get('v') || 'v20';
+const VERSION = new URL(self.location.href).searchParams.get('v') || 'v21';
 const ENGINE = new URL('../engine/' + VERSION + '/', self.location.href).href;
 const DIR = '/engine/' + VERSION;
 let py = null;

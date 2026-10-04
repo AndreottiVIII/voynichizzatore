@@ -241,6 +241,13 @@ class Disposizione:
         if stato:
             conti = [[[0, 0] for _ in range(nc + 5)] for _ in righe]
             nr = len(righe)
+            # e418: dalla v12 alla v20 questi conteggi restavano a zero (le righe che li riempivano erano finite, per errore,
+            # dopo il return di cambio_meta). Con 'conti_iniziali' partono dallo stato vero delle righe; senza, il
+            # comportamento resta quello di v12-v20, per poterle riprodurre.
+            if pesi.get('conti_iniziali'):
+                for t, w in enumerate(arr):
+                    for c, v in cl.get(w, ()):
+                        conti[riga_di[t]][c][v] += 1
         # e412: le due meta' della pagina (come G9 dell'e266: prima meta' = le prime len(righe) // 2 righe). diff[g] = conteggio
         # del segno g nella prima meta' meno quello nella seconda; l'energia premia la somma dei quadrati, divisa per i segni
         wm = pesi.get('meta', 0.0) if strato == 'D3' else 0.0
@@ -262,9 +269,6 @@ class Disposizione:
                 if k:
                     x += (diff[g] + 2 * k) ** 2 - diff[g] ** 2
             return d, wm * x
-            for t, w in enumerate(arr):
-                for c, v in cl.get(w, ()):
-                    conti[riga_di[t]][c][v] += 1
 
         def energia(x):
             return (x[1] * (x[1] - 1) + x[0] * (x[0] - 1)) / 2 - x[0] * x[1]
