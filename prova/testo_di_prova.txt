@@ -1,0 +1,9 @@
+Questo è il testo di prova del voynichizzatore.
+
+Se stai leggendo queste righe dopo averle tirate fuori da un manoscritto scritto su un altro computer, la rilettura
+funziona anche fra macchine diverse: il carattere di ogni pagina, i pesi delle parole e la codifica aritmetica hanno dato
+gli stessi numeri qui e là. Il testo contiene lettere accentate (à, è, é, ì, ò, ù), numeri (1404, 1438, 240 fogli) e
+qualche segno (—, «», ’), per controllare che torni tutto, byte per byte.
+
+Un erbario, un cielo di stelle, donne in vasche verdi, radici in barattoli: nessuno sa che cosa dica il libro, né se
+dica qualcosa.
