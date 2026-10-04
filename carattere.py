@@ -48,31 +48,34 @@ ASTA = curva([(95, X - 20), (120, 250), (165, 60), (235, 15)])                  
 PIUMA = curva([(0, 0), (25, 150), (140, 250), (290, 215), (335, 120)])           # il ricciolo sopra (sh, s, r)
 
 
-def gamba(x, alto=1010):
-    return [(x, 0), (x, alto)]
+PENDENZA = 35                   # le gambe delle forche pendono un poco a destra
 
 
-def occhio(x, verso, y=880):
-    """Il cappio in cima a una gamba: verso +1 a destra, -1 a sinistra."""
-    return curva([(x, y + 70), (x + verso * 150, y + 175), (x + verso * 290, y + 70), (x + verso * 215, y - 120), (x, y - 90)])
+def gamba(x, alto):
+    return [(x, 0), (x + PENDENZA * alto / 1000, alto)]
 
 
 def forca(tipo, x=0):
     """Le quattro forche: k (due gambe, cappio a destra), t (due gambe, due cappi), p (una gamba, cappio a destra e
-    svolazzo), f (una gamba, due cappi)."""
-    if tipo == 'k':
-        t = [gamba(150), gamba(440, 900), [(150, 900), (440, 900)], occhio(440, +1, 830)]
-    elif tipo == 't':
-        t = [gamba(300, 900), gamba(590, 900), [(300, 900), (590, 900)], occhio(590, +1, 830), occhio(300, -1, 830)]
-    elif tipo == 'p':
-        t = [gamba(170), curva([(170, 940), (330, 1040), (520, 990), (560, 860), (430, 770), (170, 800)]), curva([(170, 1010), (90, 1050), (10, 1000)])]
+    svolazzo), f (una gamba, due cappi). Gambe vicine e un poco inclinate, cappi piccoli e tondi, barra curva."""
+    if tipo in 'kt':
+        s = 0 if tipo == 'k' else 90
+        t = [gamba(130 + s, 960), gamba(370 + s, 880),
+             curva([(162 + s, 900), (270 + s, 945), (400 + s, 955), (510 + s, 930), (560 + s, 850), (505 + s, 770), (400 + s, 790)])]
+        if tipo == 't':
+            t.append(curva([(252, 900), (160, 965), (50, 950), (0, 860), (60, 775), (170, 770), (250, 815)]))
     else:
-        t = [gamba(230), curva([(230, 940), (390, 1040), (580, 990), (620, 860), (490, 770), (230, 800)]),
-             curva([(230, 940), (110, 1040), (-40, 980), (-60, 860), (40, 780), (230, 800)])]
+        s = 0 if tipo == 'p' else 90
+        t = [gamba(150 + s, 1000),
+             curva([(183 + s, 920), (310 + s, 1010), (460 + s, 995), (520 + s, 890), (455 + s, 790), (320 + s, 770), (180 + s, 815)])]
+        if tipo == 'p':
+            t.append(curva([(185, 1000), (110, 1035), (40, 1000)]))
+        else:
+            t.append(curva([(273, 920), (170, 1000), (50, 975), (0, 870), (70, 785), (180, 775), (270, 815)]))
     return sposta(t, x)
 
 
-LARGHE = {'k': 790, 't': 940, 'p': 620, 'f': 700}       # avanzamento delle forche
+LARGHE = {'k': 690, 't': 780, 'p': 610, 'f': 700}       # avanzamento delle forche
 
 
 def segni():
@@ -90,8 +93,8 @@ def segni():
     s['d'] = ([curva([(330, 330), (200, 420), (70, 300), (110, 110), (260, 10), (400, 110), (390, 290), (250, 420), (190, 560), (290, 680), (410, 620), (400, 500), (330, 410)])], 540)
     s['y'] = ([arco(250, 290, 185, 0, 360, ry=185), curva([(435, 300), (430, 60), (350, -150), (200, -250), (70, -230)])], 540)
     s['q'] = ([[(330, X + 10), (330, -250)], curva([(330, X + 10), (200, 330), (70, 180)]), [(70, 180), (440, 180)]], 520)
-    s['l'] = ([curva([(110, X - 10), (190, 330), (330, 130), (450, 10)]),
-               curva([(430, X - 20), (300, 330), (170, 190), (90, 80), (130, 0), (230, 20), (290, 130), (250, 230)])], 520)
+    # la l: un occhiello chiuso in basso e due braccia che salgono
+    s['l'] = ([curva([(80, X - 10), (150, 340), (280, 200), (350, 80), (290, -5), (170, 10), (140, 110), (240, 240), (370, 380), (460, X)])], 540)
     s['m'] = ([curva([(95, X - 20), (120, 250), (165, 60), (260, 10), (380, 90), (430, 280), (360, 440), (270, 380), (290, 150), (330, -80), (300, -260)])], 500)
     s['g'] = ([s['d'][0][0], curva([(400, 110), (420, -80), (340, -230), (200, -260)])], 540)
     for t in 'ktpf':
@@ -192,7 +195,7 @@ def costruisci(percorso=FONT):
     fb.setupHorizontalMetrics(metriche)
     fb.setupHorizontalHeader(ascent=1150, descent=-320)
     fb.setupNameTable({'familyName': 'Voynichizzatore EVA', 'styleName': 'Regular', 'uniqueFontIdentifier': 'VoynichizzatoreEVA-Regular',
-                       'fullName': 'Voynichizzatore EVA', 'psName': 'VoynichizzatoreEVA-Regular', 'version': 'Version 1.0',
+                       'fullName': 'Voynichizzatore EVA', 'psName': 'VoynichizzatoreEVA-Regular', 'version': 'Version 1.1',
                        'licenseDescription': 'MIT License', 'copyright': 'Copyright (c) 2026 Davide Caniatti'})
     fb.setupOS2(sTypoAscender=1150, sTypoDescender=-320, usWinAscent=1150, usWinDescent=320, sxHeight=X, sCapHeight=1010)
     fb.setupPost()
