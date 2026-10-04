@@ -50,7 +50,7 @@
       <li><a href="#reading">Reading back, and what breaks it</a></li>
       <li><a href="#capacity">Capacity, time, memory</a></li>
       <li><a href="#platforms">Determinism, browser and computer</a></li>
-      <li><a href="#script">The script and the PDF</a></li>
+      <li><a href="#script">The script and the illustrated book</a></li>
       <li><a href="#measures">How close it is: the measurements</a></li>
       <li><a href="#security">Security</a></li>
       <li><a href="#limits">Known limits</a></li>
@@ -485,14 +485,37 @@
     and its words are the same as those of the v20 book on all 207 pages (writing took 157 s).</p>
 
   <!-- ============================================================ -->
-  <h2 id="script">The script and the PDF</h2>
-  <p><code>carattere.py</code>, <code>pagine.py</code>. The Voynich-like script is a TrueType font (version 1.1) drawn by a
-    program, stroke by stroke; it imitates the shapes of the Voynich glyphs and is not a copy of any existing font. Simple
-    glyphs sit on the EVA letters; the compound glyphs <code>ch sh cth ckh cph cfh</code> are separate glyphs at private code
-    points from U+E000, and also ligatures of their letters, so that plain EVA text shows correctly. The PDF has one page
-    per folio (6 × 8.6 inches, vellum colour, made with Matplotlib), a half-line gap before each paragraph, and a type
-    size chosen so that 85% of the lines fit the width; the few longer lines are set smaller. Every glyph is always the
-    same: it does not imitate the variations of a pen. Text only, no drawings.</p>
+  <h2 id="script">The script and the illustrated book</h2>
+  <p><code>carattere.py</code>. The Voynich-like script is a TrueType font (version 1.1) drawn by a program, stroke by
+    stroke; it imitates the shapes of the Voynich glyphs and is not a copy of any existing font. Simple glyphs sit on the
+    EVA letters; the compound glyphs <code>ch sh cth ckh cph cfh</code> are separate glyphs at private code points from
+    U+E000, and also ligatures of their letters, so that plain EVA text shows correctly. Every glyph is always the same:
+    it does not imitate the variations of a pen.</p>
+  <p>The illustrated book (PDF, and the preview on the Write page) is made by this site, not by the program: it is a way
+    of looking at the manuscript, and it cannot be read back. Each folio of the generated manuscript is composed on a
+    page of 6 × 8.6 inches:</p>
+  <ul>
+    <li><strong>The vellum</strong> is the grain of the blank flyleaf of MS 408, made seamless and isotropic (its spectrum
+      averaged over directions, with random phases), in the colour of the written leaves, darker towards the edges.</li>
+    <li><strong>The drawing</strong> is the one of the real folio with the same name, lifted from the Yale photograph: the
+      painted areas are found by their pigments (green, blue, saturated red), the box around them is cut out, the original
+      writing inside it is erased (bands of small dark strokes, and small marks away from the paint) and the vellum is
+      evened out to white, so that the drawing can be multiplied onto the new page. 153 folios have a drawing of their own;
+      the others take one from their section (the sun of f67r for the astronomical folios, a rosette for the
+      cosmological ones); recipe folios get, as in the manuscript, a small star beside each paragraph (eight stars taken
+      from f105r–f112r); text-only folios get none.</li>
+    <li><strong>The layout</strong> tries three arrangements (drawing on one side, across the top, in the middle with text
+      above and below), each with the largest type size that fits all the lines of the folio and with the drawing shrunk
+      if needed, and keeps the one that best combines readable text with a large drawing. Lines are never broken: a line
+      too long for its place is set a little smaller.</li>
+    <li><strong>The writing</strong> is set in the Voynich-like script in brown ink, each line with a slight slope and each
+      word with a slightly different opacity and baseline; the folio number is written at the top right, as in the
+      manuscript.</li>
+    <li><strong>The PDF</strong> is made in the browser with <a href="https://github.com/parallax/jsPDF">jsPDF</a>: the text
+      is real text in the embedded font, the vellum is a single image shared by all pages, and each drawing is
+      multiplied onto its piece of vellum before being placed. A book of 207 pages weighs about 8 MB and takes about
+      half a minute.</li>
+  </ul>
 
   <!-- ============================================================ -->
   <h2 id="measures">How close it is: the measurements</h2>
@@ -619,8 +642,8 @@
     <li>The judges and the scorecard are ours, and the model was tuned on the statistics they look at; a judge built
       independently has not been tried.</li>
     <li>Still too many lines somewhat wider than the others (11.6% over 1.25 times the median, Voynich 6.0%).</li>
-    <li>Only the running paragraph text is imitated: no labels, no circular text, no drawings; the PDF has one fixed
-      shape per glyph.</li>
+    <li>Only the running paragraph text is imitated: no labels, no circular text. The drawings of the illustrated book are
+      the real ones, lifted from MS 408, not generated; the script has one fixed shape per glyph.</li>
     <li>The program imitates the statistics of the Voynich; it does not decipher it and says nothing about how it was
       made.</li>
   </ul>
@@ -657,7 +680,8 @@
     <tr><td><code>trascrizione.py</code>, <code>voynich_zl3b.json</code></td><td>the Voynich text</td></tr>
     <tr><td><code>misure.py</code>, <code>e135_stato_riga.py</code>, <code>e145_abitudini.py</code></td><td>glyph segmentation, distances, spelling choices</td></tr>
     <tr><td><code>v0.py</code></td><td>file format (<code>salva</code>, <code>carica</code>), bit helpers</td></tr>
-    <tr><td><code>carattere.py</code>, <code>pagine.py</code>, <code>VoynichizzatoreEVA.ttf</code></td><td>the script and the PDF</td></tr>
+    <tr><td><code>carattere.py</code>, <code>VoynichizzatoreEVA.ttf</code></td><td>the script</td></tr>
+    <tr><td><code>pagine.py</code></td><td>the text-only PDF of the command line (<code>pdf</code>); the site makes its own illustrated book</td></tr>
     <tr><td><code>prova.py</code></td><td>read-back test on another computer</td></tr>
   </table></div>
   </div>
