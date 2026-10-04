@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voynichizer · How it works</title>
+<meta name="description" content="How the Voynichizer writes a Voynich-like manuscript and hides a text in it: data, key, encryption, arithmetic coding of word counts, invented words, arrangement, measurements, security and limits.">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<header class="masthead">
+  <a class="title" href="./"><span class="mark" aria-hidden="true">daiin</span>Voynichizer</a>
+  <nav aria-label="Pages">
+    <a href="./">Write</a><a href="read.html">Read</a><a href="how.html" aria-current="page">How it works</a><a href="research.html">Research</a><a href="about.html">About</a>
+  </nav>
+</header>
+
+<main class="folio prose">
+  <div class="folio-no">2r</div>
+  <div class="spread narrow">
+  <div class="text">
+  <span class="tag" aria-hidden="true">qokeedy.chol</span>
+  <h1>How it works</h1>
+  <p class="lead">The Voynichizer writes a second Voynich manuscript: a new book with the same folios, sections and
+    languages as the real one, built from its vocabulary and imitating, one by one, the regularities that statistical
+    study has found in it, from the shape of the words to the structure of lines and pages. Your text, compressed and
+    encrypted with the key, decides only <em>how many times each known word appears on each page</em>; everything else
+    comes from the key and from the statistics of the real manuscript, and carries no information.</p>
+
+  <p class="note">This page describes version <strong>v20</strong> exactly as it runs on this site and in the
+    <a href="https://github.com/AndreottiVIII/voynichizzatore">repository</a> (commit <code>261e175</code>). Names in
+    <code>monospace</code> are the functions and files of the program, whose comments are in Italian. All numbers are
+    measured, and where they come from is said.</p>
+
+  <nav class="toc" aria-label="Contents">
+    <ol>
+      <li><a href="#second">A second Voynich: what it has in common with the real one</a></li>
+      <li><a href="#overview">Overview of the program</a></li>
+      <li><a href="#principle">The design principle</a></li>
+      <li><a href="#source">The source: the Voynich text</a></li>
+      <li><a href="#key">The key and the random choices</a></li>
+      <li><a href="#message">The message: compression and encryption</a></li>
+      <li><a href="#layout">The layout of each page</a></li>
+      <li><a href="#slots">Which places get invented words</a></li>
+      <li><a href="#weights">The known words of each page</a></li>
+      <li><a href="#coding">Hiding the bits in the word counts</a></li>
+      <li><a href="#new">The invented words</a></li>
+      <li><a href="#arrangement">The arrangement of the words</a></li>
+      <li><a href="#file">The manuscript file</a></li>
+      <li><a href="#reading">Reading back, and what breaks it</a></li>
+      <li><a href="#capacity">Capacity, time, memory</a></li>
+      <li><a href="#platforms">Determinism, browser and computer</a></li>
+      <li><a href="#script">The script and the PDF</a></li>
+      <li><a href="#measures">How close it is: the measurements</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#limits">Known limits</a></li>
+      <li><a href="#history">How the program came about</a></li>
+      <li><a href="#code">Map of the source code</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============================================================ -->
+  <h2 id="second">A second Voynich: what it has in common with the real one</h2>
+  <p>The aim is a book that could stand beside MS 408 as another copy of the same kind of text: not a translation, not
+    a collage of real pages, but new pages written by the same rules. Each property below is a regularity of the real
+    manuscript; the second column says how the program reproduces it, the third how close it comes (12 keys, version
+    v20; the measures are described <a href="#measures">below</a>).</p>
+  <div class="table-wrap"><table>
+    <tr><th>property of the Voynich</th><th>how the program reproduces it</th><th>measured</th></tr>
+    <tr><td>207 folios with running text, in eight sections (herbal, recipes, biological, pharmaceutical, …) and two
+      “languages”, Currier A and B</td><td>same folios, same section and language for each folio</td><td>by construction</td></tr>
+    <tr><td>the alphabet: EVA glyphs, with the compound glyphs <code>ch sh cth ckh cph cfh</code></td><td>same glyphs; the
+      words are Voynich words or built from its glyphs</td><td>glyph frequencies: judge group G1 at 0.49 (chance)</td></tr>
+    <tr><td>vocabulary: each section and language has its own words and frequencies; Zipf-like ranks</td><td>known words
+      drawn from the lexicon of the same section and language, never from the page itself</td><td>Zipf slope and distinct
+      words per word within tolerance</td></tr>
+    <tr><td>each page has a “character”, a preference for some glyphs</td><td>the character of another real page of the
+      same kind is borrowed, at strength κ</td><td>page distance from the book (G9) at 0.49</td></tr>
+    <tr><td>13.7% of the running words occur only once, more often at line starts and in first lines</td><td>invented
+      words, shaped like the one-off words, in the places where those occur</td><td>one-off share within tolerance; words
+      unique in the text slightly too many (0.154 against 0.145)</td></tr>
+    <tr><td>word shape: glyphs keep to fixed positions (<code>q</code> first, <code>-dy</code>, <code>-aiin</code> last…)</td>
+      <td>known words are real; invented ones follow 3- and 4-glyph models of the one-off words</td><td>shape of the words
+      within tolerance; glyph pairs (G2) at 0.54</td></tr>
+    <tr><td>a third of the one-off words are two words written together</td><td>joins of two known words of the page,
+      checked glyph by glyph</td><td>attested joins within tolerance</td></tr>
+    <tr><td>lines are units: special first and last words, links across word boundaries, rare repeats of a line’s first
+      glyph from the line above</td><td>place model learned from the Voynich, edge links, Metropolis arrangement</td>
+      <td>line edges (G4) 0.56, line words (G7) 0.56; line test passed 12 of 12</td></tr>
+    <tr><td>first lines of paragraphs are different (more gallows <code>p f t k</code>, longer words)</td><td>place classes
+      distinguish first lines</td><td>G8 0.62: the property the judges see best; “first lines as a register” missed in 9 keys of 12</td></tr>
+    <tr><td>words two places apart resemble each other; the line above is echoed</td><td>similarity terms in the
+      arrangement</td><td>A 1.034 (Voynich 1.047); vertical within tolerance</td></tr>
+    <tr><td>line widths vary in a characteristic way</td><td>expected width per line (v20)</td><td>lines over 1.5 × median
+      2.8% (Voynich 2.9%); over 1.25 × median 11.5% (Voynich 6.0%)</td></tr>
+    <tr><td>spelling choices vary from line to line; the page profile by position in the word</td><td>partly (agreement
+      terms in the arrangement)</td><td>not reproduced: missed in 12 keys of 12</td></tr>
+  </table></div>
+  <p>Taken together: the judges score 0.554 and 0.599 against the 0.5 of pure chance, below the threshold of 0.6 that the
+    research set in advance for “indistinguishable”; but the second judge exceeds 0.6 with about half of the keys, the
+    judges were built by us, and a few properties are still missed. The second Voynich is close, not identical, and
+    this page says exactly where it differs.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="overview">Overview of the program</h2>
+  <figure class="diagram">
+    <svg viewBox="0 0 760 330" role="img" aria-label="Diagram: the key gives a master key, which drives the encryption and every random choice; the text is compressed and encrypted into bits; page by page the bits choose the counts of the known words through an arithmetic decoder; invented words and the arrangement complete the page.">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#3a2717"/></marker></defs>
+      <g font-family="EB Garamond, Georgia, serif" font-size="15" fill="#3a2717">
+        <g stroke="#3a2717" stroke-width="1.2" fill="none">
+          <rect x="10" y="20" width="90" height="40" rx="3"/><rect x="140" y="20" width="120" height="40" rx="3"/>
+          <rect x="300" y="20" width="130" height="40" rx="3"/>
+          <rect x="10" y="110" width="90" height="40" rx="3"/><rect x="140" y="110" width="120" height="40" rx="3"/>
+          <rect x="300" y="110" width="130" height="40" rx="3"/><rect x="470" y="110" width="130" height="40" rx="3"/>
+          <rect x="10" y="230" width="120" height="56" rx="3"/><rect x="160" y="230" width="120" height="56" rx="3"/>
+          <rect x="310" y="230" width="140" height="56" rx="3" stroke="#7f3a27" stroke-width="2"/>
+          <rect x="480" y="230" width="110" height="56" rx="3"/><rect x="620" y="230" width="130" height="56" rx="3"/>
+          <path d="M100 40 H138" marker-end="url(#ar)"/><path d="M260 40 H298" marker-end="url(#ar)"/>
+          <path d="M100 130 H138" marker-end="url(#ar)"/><path d="M260 130 H298" marker-end="url(#ar)"/><path d="M430 130 H468" marker-end="url(#ar)"/>
+          <path d="M365 60 V108" marker-end="url(#ar)"/>
+          <path d="M535 150 V190 H380 V228" marker-end="url(#ar)"/>
+          <path d="M130 258 H158" marker-end="url(#ar)"/><path d="M280 258 H308" marker-end="url(#ar)"/>
+          <path d="M450 258 H478" marker-end="url(#ar)"/><path d="M590 258 H618" marker-end="url(#ar)"/>
+          <path d="M430 40 H700 V200" stroke-dasharray="4 4"/><path d="M700 200 V228" marker-end="url(#ar)" stroke-dasharray="4 4"/>
+          <path d="M700 200 H70 V228" stroke-dasharray="4 4" marker-end="url(#ar)"/>
+        </g>
+        <text x="55" y="45" text-anchor="middle">key</text>
+        <text x="200" y="45" text-anchor="middle">scrypt</text>
+        <text x="365" y="45" text-anchor="middle">master key k</text>
+        <text x="55" y="135" text-anchor="middle">text</text>
+        <text x="200" y="135" text-anchor="middle">zlib, length, tag</text>
+        <text x="365" y="135" text-anchor="middle">⊕ SHAKE-256(k)</text>
+        <text x="535" y="135" text-anchor="middle">bits + filler</text>
+        <text x="70" y="255" text-anchor="middle">page layout,</text><text x="70" y="273" text-anchor="middle">word places</text>
+        <text x="220" y="255" text-anchor="middle">weights of the</text><text x="220" y="273" text-anchor="middle">known words</text>
+        <text x="380" y="255" text-anchor="middle" fill="#7f3a27">arithmetic decoder:</text><text x="380" y="273" text-anchor="middle" fill="#7f3a27">bits → word counts</text>
+        <text x="535" y="255" text-anchor="middle">invented</text><text x="535" y="273" text-anchor="middle">words</text>
+        <text x="685" y="255" text-anchor="middle">arrangement</text><text x="685" y="273" text-anchor="middle">→ EVA file</text>
+        <text x="752" y="32" text-anchor="end" font-size="13" font-style="italic" fill="#6a4f37">random choices: HMAC-SHA256(k, use, page)</text>
+        <text x="380" y="310" text-anchor="middle" font-style="italic" fill="#6a4f37">repeated for each of the 207 pages, in the order of the manuscript</text>
+      </g>
+    </svg>
+  </figure>
+  <ol>
+    <li>The key goes through <strong>scrypt</strong> and becomes a 256-bit master key <var>k</var>.</li>
+    <li>The text is compressed (zlib), framed with its length and an authentication tag, and encrypted with a
+      <strong>SHAKE-256</strong> keystream derived from <var>k</var>. More keystream follows as filler, so the bit
+      stream that enters the book looks random from start to end.</li>
+    <li>For each of the 207 pages of the real manuscript that carry running text, in order, the program draws from
+      <var>k</var> a layout (lines, words per line, paragraphs) and decides which places hold <em>invented</em> words. The
+      other places hold <em>known</em> words: words that occur at least twice in the Voynich.</li>
+    <li>Each page has a probability distribution over the known words of its section. An <strong>arithmetic
+      decoder</strong>, fed with the encrypted bits, draws from it how many times each known word appears on the page.
+      This is the only step that carries the message.</li>
+    <li>Invented words are made with the shape of the Voynich’s one-off words; then all the words of the page are placed
+      in the lines by a sampler that imitates the Voynich’s line structure.</li>
+    <li>Reading back recomputes the distributions from the key, counts the known words of each page, runs the arithmetic
+      <em>encoder</em> on those counts to get the bits back, decrypts, checks the tag and decompresses.</li>
+  </ol>
+
+  <h3>What depends on what</h3>
+  <div class="table-wrap"><table>
+    <tr><th>part of the book</th><th>drawn from</th><th>carries the message</th></tr>
+    <tr><td>layout of each page (lines, words per line, paragraphs)</td><td>key, statistics of the section</td><td>no</td></tr>
+    <tr><td>which real page lends its “character” to each page</td><td>key</td><td>no</td></tr>
+    <tr><td>which places hold invented words</td><td>key, statistics of the one-off words</td><td>no</td></tr>
+    <tr><td><strong>how many times each known word appears on each page</strong></td><td>key, section lexicon, <strong>encrypted text</strong></td><td><strong>yes</strong></td></tr>
+    <tr><td>invented words</td><td>key, model of the one-off words, the page’s known words</td><td>no</td></tr>
+    <tr><td>order of the words in the lines</td><td>key, model of the lines</td><td>no</td></tr>
+  </table></div>
+
+  <!-- ============================================================ -->
+  <h2 id="principle">The design principle</h2>
+  <p>A message hidden in a text leaves a trace if it changes any statistic of the text. The program therefore never
+    <em>chooses</em> anything because of the message: every page is a sample from a fixed, key-dependent model of the
+    Voynich, and the encrypted message is used only as the source of randomness for one part of that sample. An
+    arithmetic decoder is exactly a device that turns random bits into a sample from a given distribution; encrypted
+    bits are indistinguishable from random bits; so a book that carries a message and a book that carries only filler
+    are samples from the same distribution. This is what “cannot be told apart” means here, and it holds by
+    construction, independently of the judges described below.</p>
+  <p>The earliest versions hid the bits in spelling choices (<code>ch</code>/<code>sh</code>, <code>k</code>/<code>t</code>,
+    <code>-dy</code>/<code>-ey</code> and others), first directly (v0), then through the same arithmetic coding (v1).
+    Spelling choices carry little information per place and are among the most studied features of the Voynich; from
+    v10 on the message lives in the counts of the words of each page, which carry about 2.7 bits per word.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="source">The source: the Voynich text</h2>
+  <p>The program carries its own copy of the Voynich text (<code>voynich_zl3b.json</code>): the ZL transliteration by
+    René Zandbergen and Gabriel Landini, version 3b of 13 May 2025 (public domain, CC0), reduced to the running
+    paragraph text, with the page, the paragraph starts, the section and the Currier language of each line. Words
+    containing unreadable characters (<code>?</code>, <code>*</code>) are left out. Pages without running paragraph text
+    (most of the zodiac and some diagrams) are not part of the model; labels and circular text are not used.</p>
+  <div class="table-wrap"><table>
+    <tr><th>what</th><th>count</th></tr>
+    <tr><td>pages with running text (the pages of every generated book)</td><td>207</td></tr>
+    <tr><td>lines; of which open a paragraph</td><td>4,130; 740</td></tr>
+    <tr><td>running words; distinct words</td><td>34,863; 7,022</td></tr>
+    <tr><td>distinct words occurring at least twice (“known words”)</td><td>2,246, covering 86.3% of the running words</td></tr>
+    <tr><td>words occurring once (“one-off words”, hapax legomena)</td><td>4,776, 13.7% of the running words</td></tr>
+    <tr><td>lines per page; words per line</td><td>median 14 (4–54); median 9 (mean 8.4)</td></tr>
+  </table></div>
+  <div class="table-wrap"><table>
+    <tr><th>section (ZL code)</th><th>Currier A</th><th>Currier B</th><th>unassigned</th></tr>
+    <tr><td>herbal (H)</td><td>95</td><td>32</td><td>1</td></tr>
+    <tr><td>recipes, “stars” (S)</td><td>2</td><td>23</td><td>–</td></tr>
+    <tr><td>biological, “bathing” (B)</td><td>–</td><td>19</td><td>–</td></tr>
+    <tr><td>pharmaceutical (P)</td><td>16</td><td>–</td><td>–</td></tr>
+    <tr><td>text only (T)</td><td>1</td><td>5</td><td>–</td></tr>
+    <tr><td>cosmological (C)</td><td>–</td><td>4</td><td>4</td></tr>
+    <tr><td>astronomical (A)</td><td>–</td><td>–</td><td>5</td></tr>
+  </table></div>
+  <p>Glyphs are counted as EVA letters, with <code>ch</code>, <code>sh</code>, <code>cth</code>, <code>ckh</code>,
+    <code>cph</code>, <code>cfh</code> as single glyphs (longest match first).</p>
+
+  <!-- ============================================================ -->
+  <h2 id="key">The key and the random choices</h2>
+  <ul>
+    <li><strong>Master key:</strong> <code>k = scrypt(key in UTF-8, salt = "voynichizzatore/canale-sacco/1", N = 2<sup>15</sup>,
+      r = 8, p = 1, length 32 bytes)</code>. scrypt costs 128·<var>r</var>·<var>N</var> = 32 MiB of memory per evaluation,
+      which makes guessing keys slow and expensive.</li>
+    <li><strong>Generators:</strong> every random choice has its own generator, one per page and per use:
+      <code>random.Random(int(first 16 bytes of HMAC-SHA256(k, "sacco|<var>use</var>|<var>page</var>")))</code>, Python’s
+      Mersenne Twister.</li>
+  </ul>
+  <div class="table-wrap"><table>
+    <tr><th>use</th><th>decides</th><th>needed to read back</th></tr>
+    <tr><td><code>carattere</code></td><td>which real page lends its character to the page</td><td>yes</td></tr>
+    <tr><td><code>impaginazione</code></td><td>the layout of the page</td><td>no</td></tr>
+    <tr><td><code>posti</code></td><td>which places hold invented words</td><td>no</td></tr>
+    <tr><td><code>ordine</code></td><td>the initial order of the known words</td><td>no</td></tr>
+    <tr><td><code>nuove</code></td><td>the invented words</td><td>no</td></tr>
+    <tr><td><code>disposizione</code> (one for the book)</td><td>the arrangement of all pages</td><td>no</td></tr>
+  </table></div>
+  <p>Because each page and use has its own generator, reading back recomputes only what it needs (the distributions)
+    and does not rebuild the book.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="message">The message: compression and encryption</h2>
+  <p><code>bit_cifrati</code>, <code>testo_dai_bit</code>.</p>
+  <div class="table-wrap"><table>
+    <tr><th>field</th><th>size</th><th>content</th></tr>
+    <tr><td>length</td><td>4 bytes</td><td>length of the compressed text, big-endian</td></tr>
+    <tr><td>tag</td><td>8 bytes</td><td>first 8 bytes of HMAC-SHA256(<var>k</var>, <code>"etichetta"</code> ‖ compressed text)</td></tr>
+    <tr><td>data</td><td>variable</td><td>the text in UTF-8, compressed with zlib at level 9</td></tr>
+  </table></div>
+  <ul>
+    <li>The frame is XORed with the start of the keystream SHAKE-256(<var>k</var> ‖ <code>"flusso"</code>); the next
+      30,000 bytes of the same keystream follow as filler. Bits are taken most significant first.</li>
+    <li>A book with no message uses filler only. Filler and ciphertext are both keystream-like, so the counts of a book
+      with a message and of one without come from the same distribution, and nobody can tell where a message ends, or
+      whether there is one.</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2 id="layout">The layout of each page</h2>
+  <p><code>statistiche_gabbia</code>, <code>gabbia_statistica</code>. The generated page keeps the name, section and
+    language of the real page, but not its layout. From the pages of the same section and language (or of the same
+    section, or of the whole book, when fewer than five pages are available) the program draws, with the generator
+    <code>impaginazione</code>:</p>
+  <ul>
+    <li>the number of lines of the page, and the page “width”, i.e. the median number of words per line of a real page;</li>
+    <li>paragraph lengths in lines, until the page is full (a leftover single line closes the previous paragraph,
+      because the Voynich has no one-line paragraphs);</li>
+    <li>for each line, its number of words: the width times a ratio drawn from the real ratios of lines with the same
+      role (first, middle or last line of a paragraph, or single line).</li>
+  </ul>
+  <p>No page of a generated book has the layout of a real page. Books are therefore a little longer or shorter than the
+    Voynich: 4,050–4,260 lines in our tests (Voynich 4,130), about 35,000–36,600 words (Voynich 34,863).</p>
+
+  <!-- ============================================================ -->
+  <h2 id="slots">Which places get invented words</h2>
+  <p>Each place in a line belongs to one of eight classes: line opening a paragraph or not, times first, second,
+    middle or last word of the line. In the Voynich the share of one-off words depends strongly on the class:</p>
+  <div class="table-wrap"><table>
+    <tr><th>place in the line</th><th>other lines</th><th>first line of a paragraph</th></tr>
+    <tr><td>first word</td><td>0.175</td><td>0.477</td></tr>
+    <tr><td>second word</td><td>0.090</td><td>0.200</td></tr>
+    <tr><td>middle</td><td>0.087</td><td>0.189</td></tr>
+    <tr><td>last word</td><td>0.212</td><td>0.308</td></tr>
+  </table></div>
+  <p>With the generator <code>posti</code>, each place holds an invented word with probability <code>min(0.95, share of
+    its class × m)</code>, where <var>m</var> is the one-off rate of the page that lends its character (next section)
+    divided by the book average. The remaining <var>n</var> places of the page take known words.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="weights">The known words of each page</h2>
+  <p><code>Sacco.carattere</code>, <code>Sacco.pesi_carattere</code>, <code>canale_sacco.distribuzione</code>.</p>
+  <ul>
+    <li><strong>Lexicon.</strong> The lexicon of page <var>p</var> is the list of all occurrences of known words on the
+      <em>other</em> pages of the same section and language (falling back to the section, then to the book, if it has
+      fewer than 500 occurrences). Its size is 283–2,246 distinct words, median 1,170. A page never draws from itself.</li>
+    <li><strong>Character.</strong> Real pages differ in the glyphs they prefer. With the generator <code>carattere</code>
+      the program picks another real page <var>q</var> of the same section and language (with at least 40 known words)
+      and measures, for each glyph <var>g</var>, how much more or less <var>q</var> uses it than its section:
+      <span class="formula">δ<sub><var>g</var></sub> = log[ (c<sub><var>q</var></sub>(<var>g</var>) + α f(<var>g</var>)) / (n<sub><var>q</var></sub> + α) / f(<var>g</var>) ]</span>
+      with α = 50, c<sub><var>q</var></sub>(<var>g</var>) the count of <var>g</var> in the known words of <var>q</var>,
+      n<sub><var>q</var></sub> their total and f(<var>g</var>) the frequency of <var>g</var> in the section lexicon.</li>
+    <li><strong>Weights.</strong> Each word <var>w</var> of the lexicon gets the weight
+      <span class="formula">c(<var>w</var>)<sup>γ</sup> · exp( κ · Σ<sub><var>g</var></sub> n<sub><var>g</var></sub>(<var>w</var>) δ<sub><var>g</var></sub> )</span>
+      where c(<var>w</var>) is its count in the lexicon, n<sub><var>g</var></sub>(<var>w</var>) the number of glyphs
+      <var>g</var> in it, γ = 0.9758 and κ = 0.6435 (fitted on the measurements; the parameters are in
+      <code>pezzi_parametri_v20.json</code>).</li>
+    <li>Weights are turned into integers on a scale of 2<sup>40</sup> (at least 1) and sorted from the heaviest, ties by
+      the word, so that writing and reading see exactly the same list on any computer.</li>
+  </ul>
+  <p>For example, with one key the page f1r gets a lexicon of 598 words, an entropy of 8.25 bits per word and
+    <code>ol</code>, <code>shedy</code>, <code>chedy</code>, <code>shey</code>, <code>or</code> as its most likely words;
+    f33v gets 844 words with <code>aiin</code>, <code>daiin</code>, <code>or</code>, <code>ar</code>, <code>okaiin</code>
+    at the top; f103r, a recipe page, 1,481 words with <code>shedy</code>, <code>chedy</code>, <code>qokeey</code>.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="coding">Hiding the bits in the word counts</h2>
+  <p><code>conteggi_dai_bit</code>, <code>bit_dai_conteggi</code>, <code>_passi</code>; the coder is in <code>v1.py</code>.</p>
+  <p>Given <var>n</var> places and integer weights <var>w</var><sub>1</sub> ≥ … ≥ <var>w</var><sub><var>m</var></sub>
+    (total <var>W</var>), the counts are drawn as a chain of binomials, which is exactly one multinomial draw:</p>
+  <p class="formula">c<sub>1</sub> ~ Bin(<var>n</var>, <var>w</var><sub>1</sub>/<var>W</var>), &nbsp;
+    c<sub>2</sub> ~ Bin(<var>n</var> − c<sub>1</sub>, <var>w</var><sub>2</sub>/(<var>W</var> − <var>w</var><sub>1</sub>)), … ;
+    &nbsp;the last word takes what remains.</p>
+  <p>Each binomial is drawn as a sequence of yes/no decisions: having already placed <var>j</var> copies of the word,
+    “stop here?” has the probability</p>
+  <p class="formula"><var>h<sub>j</sub></var> = P(X = <var>j</var>) / P(X ≥ <var>j</var>), &nbsp; X ~ Bin(remaining places, <var>w</var>/remaining weight)</p>
+  <p>computed in double precision and quantised to 16 bits (between 1 and 65,535 out of 65,536). Every decision is a
+    binary symbol produced by an <strong>arithmetic decoder</strong> (the coder of Witten, Neal and Cleary, with 32-bit
+    registers and underflow handling) whose input is the encrypted bit stream:</p>
+  <ul>
+    <li>an arithmetic decoder turns uniformly random bits into symbols with exactly the requested probabilities, up to the
+      16-bit quantisation; since the encrypted bits are indistinguishable from random, the counts are an honest sample
+      of the page’s distribution, whatever the text;</li>
+    <li>the bits are consumed in reading order, page by page. A short message sits in the first few pages (1,160 bits in
+      4 pages), a long one runs through the book (76,888 bits in 200 pages); the Latin test text of the measurements,
+      38,304 bits, fills 128 of the 207 pages. Filler does the rest;</li>
+    <li>the capacity of the book is the number of bits the decoder has consumed when the last page is done, minus the
+      32 bits of its register: if the message needs more, the program stops with “text too long for this book”.</li>
+  </ul>
+  <p>The known words that result are shuffled (generator <code>ordine</code>) and go to the arrangement together with the
+    invented words.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="new">The invented words</h2>
+  <p><code>parole_nuove.FormeUniche</code>. Invented words imitate the 4,776 words that occur only once in the Voynich:</p>
+  <ul>
+    <li>for each of the eight place classes, a length <var>L</var> (in glyphs) is drawn from the lengths of the one-off
+      words in that class;</li>
+    <li>a glyph sequence is drawn from a model of the one-off words: four-glyph contexts seen at least three times
+      (1,044 of them), backing off to three-glyph contexts (422), with the counts of the class plus a tenth of the counts
+      of all classes. A candidate must have at least two glyphs, have length <var>L</var> (up to 400 tries, then the
+      closest), and be neither a Voynich word nor a word already used in the book;</li>
+    <li>with probability 0.25, an invented word of six glyphs or more is instead the <em>join</em> of two known words of
+      the same page whose lengths add up to <var>L</var>, accepted only if every glyph triple in it occurs in the one-off
+      words and the two triples across the join have a conditional probability of at least 0.05. In the Voynich a third
+      of the “attested joins” come from one-off words made of two words written together;</li>
+    <li>six candidates are drawn and one is chosen with weight
+      <span class="formula">exp( 0.37 · Σ<sub><var>g</var></sub> profile(<var>g</var>) )</span>
+      where the profile is the log-ratio of each common glyph (at least 1% of the book) on this page’s known words against
+      the whole book, smoothed with α = 50: invented words follow the character of their page.</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2 id="arrangement">The arrangement of the words</h2>
+  <p><code>disposizione.py</code>, <code>modello.py</code>. The arrangement carries no information: reading back ignores
+    it. Its purpose is to make the lines look like the Voynich’s, where the place of a word in the line, its neighbours
+    and the line above are far from random. Two models are learned from the Voynich when the program starts:</p>
+  <ul>
+    <li><strong>Place affinity:</strong> a multinomial logistic regression (scikit-learn, C = 1) from 578 binary features
+      of a word (first glyph, first two, last, last two, length up to 9, prefix and ending from a segmentation into the
+      150 most frequent pieces, presence of <code>p</code> and <code>f</code>) to the eight place classes. It is learned on
+      features, not on the identity of the words, so it applies to invented words too.</li>
+    <li><strong>Links between neighbours:</strong> observed/expected ratios, clipped to [0.2, 5], for the pairs
+      (ending, prefix), (prefix, prefix) and (last glyph, first glyph) of consecutive words; whether the two words
+      written together form a word of the book (log 0.0916/0.0485 if yes, log 0.9084/0.9515 if not: 9.16% of
+      neighbouring pairs in the Voynich against 4.85% after shuffling); whether the pair occurs on other pages.</li>
+  </ul>
+  <p>The score of an arrangement is a weighted sum (weights of v20):</p>
+  <div class="table-wrap"><table>
+    <tr><th>term</th><th>weight</th></tr>
+    <tr><td>place affinity of every word</td><td>1</td></tr>
+    <tr><td>(ending, prefix) and (prefix, prefix) links between neighbours</td><td>1.003</td></tr>
+    <tr><td>neighbours that form an attested word when joined</td><td>0.979</td></tr>
+    <tr><td>(last glyph, first glyph) link between neighbours</td><td>0.742</td></tr>
+    <tr><td>neighbouring pair seen on other pages</td><td>−0.366</td></tr>
+    <tr><td>identical neighbours</td><td>−0.417</td></tr>
+    <tr><td>similarity with the word in the same position in the line above (1 − normalised Levenshtein)</td><td>0.152</td></tr>
+    <tr><td>first glyph of a line equal to the first glyph of the line above (the Voynich avoids it)</td><td>−0.948</td></tr>
+    <tr><td>similarity of words two places apart in a line</td><td>0.300</td></tr>
+    <tr><td>spelling choices agreeing within a line; with the line above</td><td>0.044; 0.048</td></tr>
+    <tr><td>difference in glyph content between the two halves of the page (Σ of squared differences / glyphs)</td><td>1.103</td></tr>
+    <tr><td>line widths in characters: squared deviation from the expected width (new in v20)</td><td>−0.01</td></tr>
+  </table></div>
+  <p>The expected width of a line (v20) comes from a curve measured on the Voynich: eleven points relating the
+    logarithm of the line’s words over the page median to the logarithm of its width in characters over the page
+    median, linear between the points; the expected widths are scaled so that they add up to the characters of the page,
+    and a word is as wide as its EVA letters plus one space.</p>
+  <p>Starting from a random order, the sampler proposes 60 × <var>N</var> swaps of two random words of the page
+    (<var>N</var> = words on the page) and accepts each with the Metropolis rule at temperature 1: always if the score
+    does not decrease, otherwise with probability e<sup>Δ</sup>. This step takes about four fifths of the writing time.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="file">The manuscript file</h2>
+  <p>UTF-8 text; lines starting with <code>#</code> are comments; then one line per line of the manuscript, with the
+    folio and line number, the words separated by dots, and <code>@</code> in front of the lines that open a paragraph:</p>
+  <pre class="file">@&lt;f1r.1&gt; shocphol.shol.daiin.shdal.daiin.ckhed.ofy.qopchedy.cfhol.shey.dam
+&lt;f1r.2&gt; yfars.orom.cheey.dal.olsheol.sheodaiin.dair.oraiin.otaldain.chedy.kchody.oram</pre>
+  <p>A book is about 260 KB. Folio names are those of the real manuscript (f1r … f116r, including sub-pages such as
+    f67r1 and the rosette foldout fRos).</p>
+
+  <!-- ============================================================ -->
+  <h2 id="reading">Reading back, and what breaks it</h2>
+  <ol>
+    <li>Derive <var>k</var> from the key; for each page, recompute the distribution of its known words (lexicon, borrowed
+      character, weights): this needs only the generator <code>carattere</code>.</li>
+    <li>Count how many times each word of that distribution occurs on the page; every other word and the order of the
+      words are ignored.</li>
+    <li>Run the arithmetic <em>encoder</em> on the same yes/no decisions: it gives back the bits.</li>
+    <li>XOR with the keystream, read the length, check the HMAC tag, decompress.</li>
+  </ol>
+  <div class="table-wrap"><table>
+    <tr><th>change to a manuscript</th><th>effect on reading</th></tr>
+    <tr><td>moving words within a page, or between lines of the same page</td><td>none</td></tr>
+    <tr><td>changing an invented word into another word that is not in the page’s lexicon</td><td>none</td></tr>
+    <tr><td>adding, removing or changing a known word, or moving one to another page</td><td>the decisions change from that point: “wrong key, or altered manuscript”</td></tr>
+    <tr><td>wrong key</td><td>“wrong key, or manuscript without a message” (length check) or “altered manuscript” (tag)</td></tr>
+    <tr><td>the PDF</td><td>cannot be read: there is no program from the script back to EVA</td></tr>
+  </table></div>
+  <p>The tag is 64 bits: a wrong key passes it with probability 2<sup>−64</sup>.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="capacity">Capacity, time, memory</h2>
+  <div class="table-wrap"><table>
+    <tr><th>measure</th><th>value</th></tr>
+    <tr><td>capacity of a book (bits of the encrypted frame)</td><td>80,344–84,678 in our test keys; it depends on the key</td></tr>
+    <tr><td>the same, per known word</td><td>about 2.7 bits</td></tr>
+    <tr><td>frame overhead</td><td>12 bytes</td></tr>
+    <tr><td>examples</td><td>174 characters → 1,160 bits; 1,027 characters of Italian → 4,936 bits;
+      32,014 characters of very repetitive English → 76,888 bits</td></tr>
+    <tr><td>writing, desktop computer</td><td>about 105 s: model 9 s, word counts 7 s, arrangement 87 s, check 2 s</td></tr>
+    <tr><td>writing, this site (browser)</td><td>about 3½–4½ minutes</td></tr>
+    <tr><td>reading back</td><td>about 5 s on a computer, 12 s in the browser</td></tr>
+    <tr><td>memory in the browser</td><td>about 400 MB to write, 480 MB with the PDF</td></tr>
+    <tr><td>download on first use</td><td>about 27 MB (Python and its libraries), 10 MB more for the PDF</td></tr>
+  </table></div>
+  <p>How many characters fit depends on how well the text compresses: ordinary prose fits about 20,000 characters, a
+    repetitive text more. The site measures the text before writing: a text that cannot fit is refused at once; a text
+    near the limit is checked as soon as the capacity of the book is known, about a tenth of the way through.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="platforms">Determinism, browser and computer</h2>
+  <ul>
+    <li>On one computer the program is deterministic: the same text and key give the same file, byte for byte, also
+      across Python hash seeds (tested with seeds 0 and 12345).</li>
+    <li>This site runs the program’s files, unchanged, in the browser with Pyodide 314.0.7 (Python 3.14.2, NumPy 2.4.6,
+      SciPy 1.18.0, scikit-learn 1.8.0); our reference computer used Python 3.12.10, NumPy 2.5.3, SciPy 1.18.1,
+      scikit-learn 1.9.1. The <strong>words of every page come out identical</strong>: the floating-point quantities
+      behind the counts (word weights, binomial probabilities) are rounded to integers before use, weights on a scale of
+      2<sup>40</sup> and probabilities on 16 bits, so a difference in the last digit between two machines could change
+      them only if it fell exactly on a rounding boundary, which never happened in our tests. Their <strong>order in
+      the lines</strong> may differ, because the arrangement compares floating-point scores of a fitted model at every
+      step. Either way, a manuscript
+      written here reads back with the command-line program, and vice versa.</li>
+    <li>The browser’s Python has no <code>hashlib.scrypt</code>; the site supplies it from
+      <a href="https://github.com/paulmillr/noble-hashes">noble-hashes</a> 2.4.0, checked against the RFC 7914 test vector
+      every time the page starts. Progress is read by wrapping, from outside, the two functions the program calls once
+      per page; what they compute is not changed. The files are listed with their SHA-256 in
+      <code>engine/v20/manifest.json</code>.</li>
+    <li>v20 differs from v17 only in the arrangement, so it reads manuscripts written by v17; the word counts of every
+      page are identical between the two versions.</li>
+  </ul>
+  <h3>The acceptance test of this site</h3>
+  <p>Five cases, each written both by the command-line program on a computer and by this site in the browser, then read
+    back crosswise (4 October 2026, version v20):</p>
+  <div class="table-wrap"><table>
+    <tr><th>case</th><th>text</th><th>browser → computer</th><th>computer → browser</th><th>v17 book → v20</th><th>wrong key</th><th>same words on every page</th></tr>
+    <tr><td>c1</td><td>174 characters of English</td><td>exact</td><td>exact</td><td>exact</td><td>rejected</td><td>207 of 207</td></tr>
+    <tr><td>c2</td><td>1,027 characters of Italian with accents, quotes, blank lines, double spaces; key with accents</td><td>exact</td><td>exact</td><td>exact</td><td>rejected</td><td>207 of 207</td></tr>
+    <tr><td>c3</td><td>Greek, Russian, Chinese, Japanese, Korean, Arabic, Hebrew, emoji, combining marks, tabs, a Windows line end; key with emoji</td><td>exact</td><td>exact</td><td>exact</td><td>rejected</td><td>207 of 207</td></tr>
+    <tr><td>c4</td><td>32,014 characters, 76,888 bits: 91% of that book’s capacity; a 264-character key</td><td>exact</td><td>exact</td><td>exact</td><td>rejected</td><td>207 of 207</td></tr>
+    <tr><td>c5</td><td>a book with no message</td><td>“no message”, as it should</td><td>“no message”</td><td>“no message”</td><td>rejected</td><td>207 of 207</td></tr>
+  </table></div>
+  <p>The capacity of each book was the same on both sides (80,344–84,678 bits), and the case c1 written twice in the
+    browser gave the same file byte for byte. Writing took 216–350 s in the browser, on a computer busy with other work.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="script">The script and the PDF</h2>
+  <p><code>carattere.py</code>, <code>pagine.py</code>. The Voynich-like script is a TrueType font (version 1.1) drawn by a
+    program, stroke by stroke; it imitates the shapes of the Voynich glyphs and is not a copy of any existing font. Simple
+    glyphs sit on the EVA letters; the compound glyphs <code>ch sh cth ckh cph cfh</code> are separate glyphs at private code
+    points from U+E000, and also ligatures of their letters, so that plain EVA text shows correctly. The PDF has one page
+    per folio (6 × 8.6 inches, vellum colour, made with Matplotlib), a half-line gap before each paragraph, and a type
+    size chosen so that 85% of the lines fit the width; the few longer lines are set smaller. Every glyph is always the
+    same: it does not imitate the variations of a pen. Text only, no drawings.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="measures">How close it is: the measurements</h2>
+  <p>Generated books are compared with the Voynich by two classifiers (“judges”), a scorecard of 18 properties, 8 further
+    properties and a test of the line structure. They were built during the research and are not part of the program;
+    their code is in the private research repository. The measurements hide the same Latin text (the opening of
+    Isidore’s <em>Etymologiae</em>, book XVII, about 1,668 words, 38,304 bits once compressed and encrypted) with
+    12 keys, and report the mean over the keys.</p>
+
+  <h3>The two judges</h3>
+  <ul>
+    <li><strong>Unit:</strong> a page with at least 40 words. Each real page is paired with the generated page of the same
+      name.</li>
+    <li><strong>Classifier:</strong> standardisation followed by a logistic regression (L2, C = 1), fitted inside each fold.</li>
+    <li><strong>Validation:</strong> 10-fold cross-validation stratified and grouped by page name, so that a real page and
+      its twin always fall in the same fold; repeated with 5 seeds. The out-of-fold probabilities of each seed give one
+      ROC AUC; the AUC of a key is the mean over the seeds. 0.5 means the judge is guessing, 1 that it never fails; the
+      research set ≤ 0.6 as “indistinguishable” and ≥ 0.7 as “distinguishable”.</li>
+    <li><strong>Controls:</strong> the same judge separates Currier A from B pages with AUC 1.000, and gives 0.52–0.53 with
+      random labels.</li>
+  </ul>
+  <div class="table-wrap"><table>
+    <tr><th>group</th><th>what it measures on each page</th><th>features</th><th>AUC of the group alone, v20</th></tr>
+    <tr><td>G1</td><td>frequencies of the 30 most frequent glyphs</td><td>30</td><td>0.49</td></tr>
+    <tr><td>G2</td><td>frequencies of the 150 most frequent pairs of consecutive glyphs inside words</td><td>150</td><td>0.54</td></tr>
+    <tr><td>G3</td><td>word length (mean, deviation), distinct words per word, words unique in the page, words unique in the text, share of the top 100 words</td><td>6</td><td>0.60</td></tr>
+    <tr><td>G4</td><td>line edges: first glyph and last glyph of the lines, similarity of neighbours, neighbours that form an attested word</td><td>22</td><td>0.56</td></tr>
+    <tr><td>G5</td><td>vertical similarity with the line above</td><td>1</td><td>0.51</td></tr>
+    <tr><td>G6</td><td>neighbouring pairs seen elsewhere, identical neighbours, similarity at distance two</td><td>3</td><td>0.53</td></tr>
+    <tr><td>G7</td><td>length of the first, second and last word of a line; first words in y/d/s; last words in m/n/l/r/y</td><td>9</td><td>0.56</td></tr>
+    <tr><td>G8</td><td>first lines of paragraphs: excess of p/f/t/k glyphs, word length</td><td>5</td><td>0.62</td></tr>
+    <tr><td>G9</td><td>distance (Jensen–Shannon) of the page’s glyphs from the book’s, and between the page’s two halves</td><td>2</td><td>0.49</td></tr>
+  </table></div>
+  <p>Judge 1 (e231) uses G1–G5, 209 features; judge 2 (e266) uses G1–G9, 228 features. The features the second judge
+    leans on most (first key) are pairs of neighbouring words seen elsewhere (generated 0.236, Voynich 0.224), neighbours
+    forming an attested word (0.084 against 0.092), a few glyph pairs (<code>l+ch</code>, <code>d+y</code>,
+    <code>r+ch</code>), lines starting with <code>t</code>, and words unique in the text (0.154 against 0.145).</p>
+
+  <h3>The scorecard</h3>
+  <p>Eighteen properties of the text, each with a tolerance around the Voynich’s value, measured on the whole book cut
+    into pseudo-pages of 29 lines. The Voynich itself fails one of them (the “gradient”, 0.683 against a band of
+    0.70–0.97, a defect of the band), so 17 are attainable.</p>
+  <div class="table-wrap"><table>
+    <tr><th>property</th><th>passes if</th></tr>
+    <tr><td>uncertainty of the next glyph (h2)</td><td>within ±0.15 of the Voynich</td></tr>
+    <tr><td>predictability of a space from the previous glyph</td><td>within ±0.08</td></tr>
+    <tr><td>share of one-off words in 34,000 words</td><td>within ±0.08</td></tr>
+    <tr><td>distinct words per word</td><td>within ±0.04</td></tr>
+    <tr><td>word identical to the previous one (relative to the line)</td><td>within ±0.2</td></tr>
+    <tr><td>similarity of the words of a line (“homogeneity”)</td><td>within ±0.008</td></tr>
+    <tr><td>similarity six lines apart over similarity within a line (“gradient”)</td><td>between 0.70 and 0.97</td></tr>
+    <tr><td>information between the last glyph of a word and the first of the next</td><td>within ±0.05</td></tr>
+    <tr><td>neighbours that form an attested word, over chance</td><td>between 1.5 and 2.5</td></tr>
+    <tr><td>flat curve of new words (one-off share at 1,000 words minus at 34,000)</td><td>at most 0.10</td></tr>
+    <tr><td>drift of the vocabulary between near and distant blocks</td><td>at least 0.05</td></tr>
+    <tr><td>page profile (information by position in the word)</td><td>R between 0.8 and 1.25, share within 0.5×–1.5×</td></tr>
+    <tr><td>correlation of the lengths of neighbouring words</td><td>at least 0.08</td></tr>
+    <tr><td>Zipf slope</td><td>within ±0.10</td></tr>
+    <tr><td>shape of the words (glyphs at first, second, second-last, last position)</td><td>no farther than Voynich A is from B</td></tr>
+    <tr><td>vertical: same-position word in the line above</td><td>at least 1.015</td></tr>
+    <tr><td>formulas: two- and three-word sequences recurring at least 10 pages apart</td><td>within 0.5×–1.5×</td></tr>
+    <tr><td>line edges: glyphs at line start and end</td><td>within 0.5×–2×</td></tr>
+  </table></div>
+
+  <h3>Eight further properties</h3>
+  <div class="table-wrap"><table>
+    <tr><th>property</th><th>passes if</th></tr>
+    <tr><td>rare words per page (herbal pages)</td><td>R at most 5 (Voynich 1.96)</td></tr>
+    <tr><td>distinct words per word, within a page</td><td>within ±0.03</td></tr>
+    <tr><td>words unique within a page</td><td>within ±0.04</td></tr>
+    <tr><td>spread of word lengths</td><td>within ±0.04</td></tr>
+    <tr><td>first lines of paragraphs as a register of their own</td><td>z above 3</td></tr>
+    <tr><td>spelling choices that vary by line</td><td>at least 10 of 12 classes with z above 3</td></tr>
+    <tr><td>agreement of word endings</td><td>within ±0.012</td></tr>
+    <tr><td>neighbouring pairs seen elsewhere</td><td>within ±0.02</td></tr>
+  </table></div>
+
+  <h3>The line test</h3>
+  <p>Passes only if all five hold: a line rarely starts with the same glyph as the line above (S1 ≤ 0.7); the link between
+    the last glyph of a line and the first of the next is weak compared with inside a line (R ≤ 0.1); words two places
+    apart are at least as similar as neighbours (A ≥ 1.0); at least three of the five spelling choices vary by line beyond
+    chance; consecutive lines correlate as in the Voynich (0.207 ± 0.07).</p>
+
+  <h3>Results</h3>
+  <div class="table-wrap"><table>
+    <tr><th>measure (12 keys)</th><th>Voynich</th><th>v17</th><th>v20</th></tr>
+    <tr><td>judge 1 (e231), AUC</td><td>–</td><td>0.563 ± 0.008</td><td>0.554 ± 0.007</td></tr>
+    <tr><td>judge 2 (e266), AUC</td><td>–</td><td>0.601 ± 0.006</td><td>0.599 ± 0.005</td></tr>
+    <tr><td>scorecard (17 attainable)</td><td>17</td><td>15.0</td><td>15.6</td></tr>
+    <tr><td>further properties (of 8)</td><td>8</td><td>5.8</td><td>5.4</td></tr>
+    <tr><td>line test passed</td><td>yes</td><td>11 of 12 keys</td><td>12 of 12 keys</td></tr>
+    <tr><td>line test: S1; A; consecutive lines r</td><td>0.531; 1.047; 0.207</td><td>0.521; 1.009; 0.223</td><td>0.509; 1.034; 0.226</td></tr>
+    <tr><td>lines over 1.25 times the page median (characters)</td><td>6.0%</td><td>16.7%</td><td>11.5%</td></tr>
+    <tr><td>lines over 1.5 times the page median</td><td>2.9%</td><td>5.0%</td><td>2.8%</td></tr>
+    <tr><td>text back exactly; wrong key rejected</td><td>–</td><td>12 of 12; 12 of 12</td><td>12 of 12; 12 of 12</td></tr>
+  </table></div>
+  <p>Properties v20 misses, with the number of keys that miss them: gradient (12, the Voynich misses it too), page
+    profile (12), spelling choices by line (12), spread of word lengths (9), first lines as a register (9), homogeneity (4),
+    repetition (1), rare words per page (1). The keys used for these numbers were also used to choose between variants
+    of the program, so the numbers are slightly optimistic; on 12 keys never used for choosing (measured for v14) the
+    judges gave 0.584 and 0.609 instead of 0.566 and 0.591.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="security">Security</h2>
+  <ul>
+    <li>The building blocks are standard (scrypt, SHAKE-256, HMAC-SHA256, zlib), but the whole has not been reviewed by an
+      expert. Do not use it for secrets that matter.</li>
+    <li>The scrypt salt is fixed: the same key gives the same master key for everybody, so a dictionary of guessed keys
+      can be prepared once and tried on any book. Use a long passphrase that is yours alone.</li>
+    <li>The keystream depends only on the key, with no random value per message: two books written with the same key are
+      encrypted with the same keystream. Recovering the bits of a book requires the key (the page distributions depend on
+      it), but this has not been analysed further. Use a different key for every message.</li>
+    <li>The program hides <em>that</em> there is a message, not that the program was used: almost every word is a Voynich
+      word, so a book is recognisable as made with the Voynichizer.</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2 id="limits">Known limits</h2>
+  <ul>
+    <li>Not indistinguishable from the Voynich: the second judge still recognises the pages a little (about one key in two
+      above 0.60), and several properties never come out right (above).</li>
+    <li>The judges and the scorecard are ours, and the model was tuned on the statistics they look at; a judge built
+      independently has not been tried.</li>
+    <li>Still too many lines somewhat wider than the others (11.5% over 1.25 times the median, Voynich 6.0%).</li>
+    <li>Only the running paragraph text is imitated: no labels, no circular text, no drawings; the PDF has one fixed
+      shape per glyph.</li>
+    <li>The program imitates the statistics of the Voynich; it does not decipher it and says nothing about how it was
+      made.</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2 id="history">How the program came about</h2>
+  <p>The program grew out of a statistical study of the Voynich (see <a href="research.html">Research</a>), by successive
+    versions, each measured on the same bench before being kept.</p>
+  <div class="table-wrap"><table>
+    <tr><th>version</th><th>change</th><th>judges (AUC)</th></tr>
+    <tr><td>v0–v1</td><td>message in five spelling choices of a generated text (v1: through arithmetic coding)</td><td>–</td></tr>
+    <tr><td>v5</td><td>best “copy and modify” generator</td><td>0.816 / 0.917 (3 keys)</td></tr>
+    <tr><td>v8</td><td>first generator “by pieces”: word bag per page, then arrangement</td><td>0.604 / 0.715</td></tr>
+    <tr><td>v10</td><td>message in how often each known word appears on each page</td><td>0.572 / 0.690</td></tr>
+    <tr><td>v11–v12</td><td>line test passed; the two halves of a page made different</td><td>0.576 / 0.619</td></tr>
+    <tr><td>v13–v14</td><td>word bag refitted; plausible joins of words</td><td>0.566 / 0.591</td></tr>
+    <tr><td>v15</td><td>encryption with scrypt, SHAKE-256 and HMAC</td><td>0.570 / 0.601</td></tr>
+    <tr><td>v16–v17</td><td>page layout taken from another page (v16), then drawn from statistics (v17); first published</td><td>0.563 / 0.601</td></tr>
+    <tr><td>v18–v20</td><td>line widths in characters (v18–v19); alternation within the line restored (v20); published</td><td>0.554 / 0.599</td></tr>
+  </table></div>
+
+  <!-- ============================================================ -->
+  <h2 id="code">Map of the source code</h2>
+  <div class="table-wrap"><table>
+    <tr><th>file</th><th>role</th></tr>
+    <tr><td><code>voynichizzatore.py</code></td><td>command line: <code>encode</code>, <code>decode</code>, <code>empty</code>, <code>pdf</code></td></tr>
+    <tr><td><code>canale_sacco.py</code></td><td>key, encryption, page loop, layout, binomial chain, reading back</td></tr>
+    <tr><td><code>v1.py</code></td><td>binary arithmetic coder (<code>Nasconditore</code> hides, <code>Rilettore</code> reads back)</td></tr>
+    <tr><td><code>sacco.py</code></td><td>section lexicons, character of the page, weights, places of invented words</td></tr>
+    <tr><td><code>parole_nuove.py</code></td><td>model of the one-off words, invented words, joins</td></tr>
+    <tr><td><code>disposizione.py</code>, <code>modello.py</code></td><td>place model, links between neighbours, line widths, Metropolis arrangement</td></tr>
+    <tr><td><code>pezzi.py</code>, <code>pezzi_parametri_v20.json</code></td><td>assembly of the pieces; the fitted parameters of v20</td></tr>
+    <tr><td><code>trascrizione.py</code>, <code>voynich_zl3b.json</code></td><td>the Voynich text</td></tr>
+    <tr><td><code>misure.py</code>, <code>e135_stato_riga.py</code>, <code>e145_abitudini.py</code></td><td>glyph segmentation, distances, spelling choices</td></tr>
+    <tr><td><code>v0.py</code></td><td>file format (<code>salva</code>, <code>carica</code>), bit helpers</td></tr>
+    <tr><td><code>carattere.py</code>, <code>pagine.py</code>, <code>VoynichizzatoreEVA.ttf</code></td><td>the script and the PDF</td></tr>
+    <tr><td><code>prova.py</code></td><td>read-back test on another computer</td></tr>
+  </table></div>
+  </div>
+    <figure class="illus">
+      <img src="img/jars-f88r.jpg" width="180" height="1170" alt="A column of painted jars, from the pharmaceutical section of the Voynich manuscript">
+      <figcaption>Beinecke MS 408, f. 88r</figcaption>
+    </figure>
+  </div>
+</main>
+
+<footer class="colophon">
+  Voynichizer v20 · it runs entirely in your browser · drawings from Beinecke MS 408, Yale University ·
+  <a href="https://github.com/AndreottiVIII/voynichizzatore">source code</a> · MIT licence
+</footer>
+</body>
+</html>
