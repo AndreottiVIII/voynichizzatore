@@ -59,10 +59,10 @@ def testo_dai_bit(bit, chiave):
     chiaro = bytes(a ^ b for a, b in zip(dati, flusso))
     n = int.from_bytes(chiaro[:4], 'big')
     if not 0 < n <= len(chiaro) - 4 - ETICHETTA:
-        raise ValueError('chiave errata, o manoscritto senza messaggio')
+        raise ValueError('wrong key, or manuscript without a message')
     etichetta, corpo = chiaro[4:4 + ETICHETTA], chiaro[4 + ETICHETTA:4 + ETICHETTA + n]
     if not hmac.compare_digest(etichetta, hmac.new(k, b'etichetta' + corpo, hashlib.sha256).digest()[:ETICHETTA]):
-        raise ValueError('chiave errata, o manoscritto alterato')
+        raise ValueError('wrong key, or altered manuscript')
     return zlib.decompress(corpo).decode('utf-8')
 
 
@@ -274,9 +274,9 @@ def codifica(testo, chiave, versione='v9', parametri=None, verifica=True):
                         ('pagine_usate', sum(c - v1.PREC < len(cifrati) for c in [0] + consumati[:-1]) if cifrati else 0), ('pagine', len(per))])
     if testo is not None:
         if len(cifrati) > capacita:
-            raise SystemExit('testo troppo lungo per questo libro: servono %d bit, il libro ne porta %d' % (len(cifrati), capacita))
+            raise SystemExit('text too long for this book: it needs %d bits, the book carries %d' % (len(cifrati), capacita))
         if verifica and decodifica(righe, chiave, versione, parametri) != testo:
-            raise SystemExit('errore: la decodifica di controllo non restituisce il testo')
+            raise SystemExit('error: the check decoding does not return the text')
     return righe, info
 
 
@@ -302,6 +302,6 @@ def decodifica(righe, chiave, versione='v9', parametri=None):
     testa = [b ^ k for b, k in zip(bit[:32], ks[:32])]
     n = int.from_bytes(v0.da_bit(testa), 'big')
     if not 0 < n <= (len(bit) - 32) // 8:
-        raise ValueError('chiave sbagliata o manoscritto senza messaggio')
+        raise ValueError('wrong key, or manuscript without a message')
     corpo = [b ^ k for b, k in zip(bit[32:32 + 8 * n], ks[32:32 + 8 * n])]
     return zlib.decompress(v0.da_bit(corpo)).decode('utf-8')

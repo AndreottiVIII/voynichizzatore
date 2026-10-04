@@ -1,43 +1,47 @@
 # -*- coding: utf-8 -*-
-"""Voynichizzatore: un testo normale diventa un manoscritto "alla Voynich" (in EVA) con il testo nascosto nella scelta delle
-parole di ogni pagina; con la parola chiave il testo torna esatto.
+"""Voynichizer (voynichizzatore): turns any text into a "Voynich-like" manuscript (in EVA), with the text hidden in the
+choice of the words on each page; with the key, the text comes back exactly.
 
-    python voynichizzatore.py codifica testo.txt --chiave PAROLA --uscita manoscritto.txt
-    python voynichizzatore.py decodifica manoscritto.txt --chiave PAROLA --uscita testo.txt
-    python voynichizzatore.py vuoto --chiave PAROLA --uscita manoscritto.txt      (manoscritto senza messaggio)
+    python voynichizzatore.py encode text.txt --key "a long passphrase" --out manuscript.txt
+    python voynichizzatore.py decode manuscript.txt --key "a long passphrase" --out text.txt
+    python voynichizzatore.py empty --key "a long passphrase" --out manuscript.txt      (a manuscript with no message)
 """
 import argparse, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 VERSIONE = 'v17'
+ALIAS = {'codifica': 'encode', 'decodifica': 'decode', 'vuoto': 'empty'}
 
 
 def main():
-    ap = argparse.ArgumentParser(description='Voynichizzatore')
-    ap.add_argument('azione', choices=('codifica', 'decodifica', 'vuoto'))
-    ap.add_argument('file', nargs='?')
-    ap.add_argument('--chiave', required=True)
-    ap.add_argument('--uscita')
+    ap = argparse.ArgumentParser(description='Voynichizer: hide a text in a Voynich-like manuscript and read it back with the key')
+    ap.add_argument('action', choices=('encode', 'decode', 'empty', 'codifica', 'decodifica', 'vuoto'))
+    ap.add_argument('file', nargs='?', help='text to hide (encode) or manuscript to read (decode)')
+    ap.add_argument('--key', '--chiave', required=True, dest='key', help='the key (use a long passphrase)')
+    ap.add_argument('--out', '--uscita', dest='out', help='output file')
     a = ap.parse_args()
+    action = ALIAS.get(a.action, a.action)
+    if action != 'empty' and not a.file:
+        raise SystemExit('a file is required')
     import canale_sacco, v0
-    if a.azione == 'decodifica':
+    if action == 'decode':
         try:
-            testo = canale_sacco.decodifica(v0.carica(a.file), a.chiave, VERSIONE)
+            text = canale_sacco.decodifica(v0.carica(a.file), a.key, VERSIONE)
         except Exception as e:
-            raise SystemExit('niente da leggere: %s' % e)
-        if a.uscita:
-            open(a.uscita, 'w', encoding='utf-8', newline='\n').write(testo)
-            print('testo scritto in %s (%d caratteri)' % (a.uscita, len(testo)))
+            raise SystemExit('nothing to read: %s' % e)
+        if a.out:
+            open(a.out, 'w', encoding='utf-8', newline='\n').write(text)
+            print('text written to %s (%d characters)' % (a.out, len(text)))
         else:
             sys.stdout.reconfigure(encoding='utf-8', newline='\n')
-            sys.stdout.write(testo + '\n')
+            sys.stdout.write(text + '\n')
         return
-    testo = None
-    if a.azione == 'codifica':
-        testo = open(a.file, encoding='utf-8').read().replace('\r\n', '\n')
-    righe, info = canale_sacco.codifica(testo, a.chiave, VERSIONE)
-    v0.salva(righe, a.uscita or 'manoscritto.txt')
-    print('scritto %s: %d righe; messaggio %d bit su %d disponibili' % (a.uscita or 'manoscritto.txt', len(righe), info['bit_messaggio'], info['capacita_bit']))
+    text = None
+    if action == 'encode':
+        text = open(a.file, encoding='utf-8').read().replace('\r\n', '\n')
+    rows, info = canale_sacco.codifica(text, a.key, VERSIONE)
+    v0.salva(rows, a.out or 'manuscript.txt')
+    print('written %s: %d lines; message %d bits out of %d available' % (a.out or 'manuscript.txt', len(rows), info['bit_messaggio'], info['capacita_bit']))
 
 
 if __name__ == '__main__':
