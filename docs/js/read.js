@@ -52,6 +52,7 @@ $('form').addEventListener('submit', async (e) => {
     if (textUrl) URL.revokeObjectURL(textUrl);
     textUrl = URL.createObjectURL(new Blob([out.text], { type: 'text/plain' }));
     $('dl').href = textUrl;
+    $('dl').download = 'voynich-II_text_' + new Date().toISOString().slice(0, 10) + '.txt';
     $('working').hidden = true;
     $('result').hidden = false;
   } catch (err) {

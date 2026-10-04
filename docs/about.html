@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-<header class="masthead">
+<header class="masthead" id="top">
   <a class="title" href="./"><span class="mark" aria-hidden="true">daiin</span>Voynichizer</a>
   <nav aria-label="Pages">
     <a href="./">Write</a><a href="read.html">Read</a><a href="how.html">How it works</a><a href="research.html">Research</a><a href="about.html" aria-current="page">About</a>
@@ -24,6 +24,10 @@
   <p class="lead">The Voynichizer takes any text and a key and writes a second Voynich manuscript: a new book of
     207 folios with the sections, languages, vocabulary and line structure of Beinecke MS 408, in EVA, the alphabet used
     to transliterate it, and in a Voynich-like script. With the same key, the hidden text comes back exactly.</p>
+
+  <p class="colophon-note" id="colophon"><span class="rubric">Colophon.</span> Made by Davide Caniatti in 2026, alongside a
+    statistical study of the Voynich manuscript: first the research, then a generator that writes by the rules it found.
+    The program, its script and this site are free software under the MIT licence.</p>
 
   <h2>Your privacy</h2>
   <ul>
@@ -116,15 +120,21 @@
   <p>The program, the script and this site are under the MIT licence; the Voynich text is in the public domain (CC0).
     Questions and remarks: <a href="https://github.com/AndreottiVIII/voynichizzatore/issues">the repository on GitHub</a>.</p>
     </div>
-    <figure class="illus">
-      <img src="img/herbal-f33v.jpg" width="520" height="991" alt="A plant with two large flower heads, from the herbal section of the Voynich manuscript">
-      <figcaption>Beinecke MS 408, f. 33v</figcaption>
-    </figure>
+    <div class="side">
+      <figure class="illus">
+        <img src="img/herbal-f33v.jpg" width="520" height="991" alt="A plant with two large flower heads, from the herbal section of the Voynich manuscript">
+        <figcaption>Beinecke MS 408, f. 33v</figcaption>
+      </figure>
+    </div>
   </div>
 </main>
 
+<a class="totop" href="#top" aria-label="Back to the top" hidden>↑</a>
+<script src="js/top.js" defer></script>
+<script src="js/margins.js" defer></script>
+
 <footer class="colophon">
-  Voynichizer v20 · it runs entirely in your browser · drawings from Beinecke MS 408, Yale University ·
+  Voynichizer v20, by Davide Caniatti, 2026 · it runs entirely in your browser · drawings from Beinecke MS 408, Yale University ·
   <a href="https://github.com/AndreottiVIII/voynichizzatore">source code</a> · MIT licence
 </footer>
 </body>

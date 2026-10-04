@@ -48,7 +48,7 @@ async function realFolio(page) {
 }
 
 // Start fetching Python as soon as someone begins to write: by the time they press the button, it is ready.
-const warm = () => prepare().catch(() => {});
+const warm = () => prepare().then(() => { engineReady = true; if ($('text').value) estimate(); }).catch(() => {});
 $('text').addEventListener('focus', warm, { once: true });
 $('key').addEventListener('focus', warm, { once: true });
 
@@ -58,19 +58,38 @@ $('text').addEventListener('input', () => {
   clearTimeout(estimateTimer);
   estimateTimer = setTimeout(estimate, 300);
 });
+// The limit is in bits, not characters: the text becomes UTF-8 bytes, is compressed with zlib (level 9) and framed
+// with 12 bytes; a book carries 80,000-85,000 bits depending on the key. Once the program has loaded, the size is
+// computed exactly with the program's own zlib; before, it is estimated with the browser's compressor.
+const HINT = 'The limit is in bits, not characters: about 10,000 bytes once compressed, i.e. some 20,000–25,000 ' +
+  'characters of ordinary prose, more if the text is repetitive, fewer in scripts that take more bytes per character.';
+let engineReady = false;
 async function estimate() {
   const text = $('text').value;
   const hint = $('text-hint');
-  if (!text) { hint.textContent = 'Up to about 20,000 characters.'; hint.classList.remove('bad'); return; }
-  let bytes = new TextEncoder().encode(text).length;
-  try {
-    const s = new Blob([text]).stream().pipeThrough(new CompressionStream('deflate'));
-    bytes = (await new Response(s).arrayBuffer()).byteLength;
-  } catch (e) { /* no compression in this browser: count the raw bytes */ }
-  const share = (bytes + 12) * 8 / CAPACITY;
-  hint.textContent = text.length.toLocaleString('en') + ' characters · about ' + Math.max(1, Math.round(100 * share)) +
-    '% of what one book can carry' + (share > 1 ? ': too long, please shorten it' : '');
-  hint.classList.toggle('bad', share > 1);
+  if (!text) { hint.textContent = HINT; hint.classList.remove('bad'); return; }
+  const n = (x) => Number(x).toLocaleString('en');
+  const chars = [...text].length;
+  let utf8 = new TextEncoder().encode(text).length;
+  let compressed = null;
+  let exact = false;
+  if (engineReady) {
+    try { ({ utf8, compressed } = await call('need', { text })); exact = true; } catch (e) { /* fall back */ }
+  }
+  if (compressed === null) {
+    try {
+      const s = new Blob([text]).stream().pipeThrough(new CompressionStream('deflate'));
+      compressed = (await new Response(s).arrayBuffer()).byteLength;
+    } catch (e) { compressed = utf8; }
+  }
+  if (text !== $('text').value) return;          // the text changed meanwhile
+  const bits = 8 * (12 + compressed);
+  const share = bits / CAPACITY;
+  hint.textContent = n(chars) + ' characters · ' + n(utf8) + ' bytes in UTF-8 · ' + (exact ? '' : 'about ') + n(compressed) +
+    ' bytes compressed → ' + (exact ? '' : 'about ') + n(bits) + ' bits, ' + Math.max(1, Math.round(100 * share)) +
+    '% of the 80,000–85,000 bits a book carries' +
+    (bits > CAPACITY_MAX ? ': too long, please shorten it' : bits > CAPACITY ? ': it may not fit, depending on the key' : '');
+  hint.classList.toggle('bad', bits > CAPACITY);
 }
 
 // ---------------------------------------------------------------- writing
@@ -185,6 +204,11 @@ function finish(out, info, wantPdf, ms, started) {
     ' with version ' + info.version + '. ' + used;
   $('dl-txt').href = book.txtUrl;
   technical(out, info, pages, started);
+  fileNames(out.manuscript).then((stem) => {
+    $('dl-txt').download = stem + '.txt';
+    $('dl-pdf').download = stem + '.pdf';
+    $('txt-name').textContent = 'Its name: ' + stem + '.txt; the PDF has the same name, so that the two stay paired.';
+  });
   $('folio').replaceChildren(...pages.map((p, k) => new Option(p.folio, String(k))));
   $('scriptorium').hidden = true;
   $('result').hidden = false;
@@ -261,4 +285,16 @@ async function technical(out, info, pages, t) {
     ['SHA-256 of the manuscript file', '<code>' + sha + '</code>'],
   ];
   $('tech-table').innerHTML = rows.map(([a, b]) => '<tr><td>' + a + '</td><td>' + b + '</td></tr>').join('');
+}
+
+// File names: the date and the first 8 hex digits of the SHA-256 of the manuscript, the same for the .txt and the PDF
+async function fileNames(manuscript) {
+  const d = new Date();
+  const day = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  let id = Date.now().toString(16).slice(-8);
+  try {
+    const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(manuscript));
+    id = [...new Uint8Array(h)].slice(0, 4).map((b) => b.toString(16).padStart(2, '0')).join('');
+  } catch (e) { /* digest unavailable: time-based id */ }
+  return 'voynich-II_' + day + '_' + id;
 }

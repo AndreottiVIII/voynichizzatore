@@ -9,7 +9,7 @@
 <script type="module" src="js/read.js"></script>
 </head>
 <body>
-<header class="masthead">
+<header class="masthead" id="top">
   <a class="title" href="./"><span class="mark" aria-hidden="true">daiin</span>Voynichizer</a>
   <nav aria-label="Pages">
     <a href="./">Write</a><a href="read.html" aria-current="page">Read</a><a href="how.html">How it works</a><a href="research.html">Research</a><a href="about.html">About</a>
@@ -74,15 +74,21 @@
         </div>
       </section>
     </div>
-    <figure class="illus">
-      <img src="img/stars-f67r.jpg" width="560" height="684" alt="A sun with red and blue rays inside rings of stars, from the astronomical section of the Voynich manuscript">
-      <figcaption>Beinecke MS 408, f. 67r</figcaption>
-    </figure>
+    <div class="side">
+      <figure class="illus">
+        <img src="img/stars-f67r.jpg" width="560" height="684" alt="A sun with red and blue rays inside rings of stars, from the astronomical section of the Voynich manuscript">
+        <figcaption>Beinecke MS 408, f. 67r</figcaption>
+      </figure>
+    </div>
   </div>
 </main>
 
+<a class="totop" href="#top" aria-label="Back to the top" hidden>↑</a>
+<script src="js/top.js" defer></script>
+<script src="js/margins.js" defer></script>
+
 <footer class="colophon">
-  Voynichizer v20 · it runs entirely in your browser · drawings from Beinecke MS 408, Yale University ·
+  Voynichizer v20, by Davide Caniatti, 2026 · it runs entirely in your browser · drawings from Beinecke MS 408, Yale University ·
   <a href="https://github.com/AndreottiVIII/voynichizzatore">source code</a> · MIT licence
 </footer>
 </body>

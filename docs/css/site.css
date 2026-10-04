@@ -99,7 +99,7 @@ a:hover { color: var(--red-deep); }
   max-width: 940px;
   margin: 0 auto;
   padding: 58px 64px 64px;
-  background: url("../img/vellum.jpg") center / cover, var(--vellum);
+  background: url("../img/vellum-tile.jpg") 0 0 / 900px 900px repeat, var(--vellum);
   color: var(--ink);
   border-radius: 3px 6px 4px 2px;
   box-shadow: inset 0 0 70px rgba(95, 62, 30, .38), inset 0 0 8px rgba(95, 62, 30, .35), var(--shadow);
@@ -113,7 +113,9 @@ a:hover { color: var(--red-deep); }
   color: var(--ink-soft);
 }
 .spread { display: grid; grid-template-columns: minmax(0, 1fr) 36%; gap: 8px 40px; align-items: start; }
-.spread.narrow { grid-template-columns: minmax(0, 1fr) 120px; }
+.spread.narrow { grid-template-columns: minmax(0, 1fr) 26%; }
+.side { display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 34px; align-self: stretch; }
+.side .illus { width: 100%; }
 .spread > .text { min-width: 0; }
 .illus { margin: 0; text-align: center; }
 .illus img { width: 100%; height: auto; display: block; mix-blend-mode: multiply; }
@@ -314,6 +316,28 @@ summary { cursor: pointer; color: var(--ink-soft); font-style: italic; }
 .drop input { display: none; }
 .output { min-height: 220px; white-space: pre-wrap; }
 .soon { text-align: center; padding: 10px 0 20px; font-size: 24px; font-style: italic; color: var(--ink-soft); }
+.totop {
+  position: fixed;
+  right: 22px;
+  bottom: 26px;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 24px;
+  line-height: 1;
+  text-decoration: none;
+  color: #f4e8d3;
+  background: var(--red);
+  border: 1px solid var(--red-deep);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .45);
+  z-index: 10;
+}
+.totop:hover { background: var(--red-deep); color: #fff6e6; }
+.colophon-note { font-style: italic; color: var(--ink-soft); border-left: 2px solid var(--red); padding: 2px 0 2px 14px; margin: 0 0 24px; }
+.note.closing { margin-top: 30px; padding-top: 14px; border-top: 1px solid var(--ink-faint); }
 .tech table { border-collapse: collapse; width: 100%; font-size: 17px; margin: 8px 0 4px; }
 .tech td { border-bottom: 1px solid var(--ink-faint); padding: 6px 8px; vertical-align: top; }
 .tech td:first-child { color: var(--ink-soft); width: 45%; }
@@ -352,9 +376,10 @@ pre.file { font-family: var(--mono); font-size: 13px; line-height: 1.5; backgrou
   .folio { padding: 46px 22px 50px; border-radius: 0; }
   .folio-no { right: 18px; top: 12px; font-size: 19px; }
   .spread, .spread.narrow { grid-template-columns: 1fr; }
-  .spread > .illus { order: -1; margin: 0 auto 8px; }
-  .spread > .illus img { width: auto; max-width: 100%; max-height: 260px; margin: 0 auto; }
-  .spread.narrow > .illus { display: none; }
+  .spread > .side { order: -1; flex-direction: row; justify-content: center; margin: 0 auto 8px; }
+  .side .extra { display: none; }
+  .side .illus img { width: auto; max-width: 100%; max-height: 260px; margin: 0 auto; }
+  .spread.narrow > .side { display: none; }
   .toc ol { columns: 1; }
   .pair { grid-template-columns: 1fr; }
   .desk-real { display: none; }
