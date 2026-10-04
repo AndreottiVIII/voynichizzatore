@@ -6,15 +6,18 @@ manuscript, Beinecke MS 408). With the same key, the text comes back exactly.
     python voynichizzatore.py encode text.txt --key "a long passphrase" --out manuscript.txt
     python voynichizzatore.py decode manuscript.txt --key "a long passphrase" --out text.txt
     python voynichizzatore.py empty --key "a long passphrase" --out manuscript.txt
+    python voynichizzatore.py pdf manuscript.txt --out book.pdf
 
-Requires Python 3.12 with `numpy`, `scipy` and `scikit-learn` (`pip install -r requirements.txt`). Writing a manuscript
+Requires Python 3.12 with `numpy`, `scipy`, `scikit-learn` and, for the PDF, `matplotlib` (`pip install -r requirements.txt`). Writing a manuscript
 takes a couple of minutes; reading it back takes a few seconds.
 
 ## What you get
 
 - A whole book of 207 pages and about 4,200 lines, whatever the length of the text; one line of the file per line of
   the manuscript, `<page.line> words.separated.by.dots`, with `@` in front of the lines that open a paragraph.
-- It is EVA text, not an image of the pages.
+- The manuscript is EVA text. The `pdf` command then writes it out as a book, one page per page, in a Voynich-like
+  script: the font `VoynichizzatoreEVA.ttf` was drawn for this project by a program (`carattere.py`), stroke by stroke;
+  it imitates the shapes of the Voynich signs and is not a copy of any existing font. The PDF has text only, no drawings.
 - It holds about 80,000 bits, i.e. roughly 20,000 characters of text after compression. If the text is longer, the
   program says so. If it is shorter, the rest of the book is filled so that you cannot see where the message ends.
 
