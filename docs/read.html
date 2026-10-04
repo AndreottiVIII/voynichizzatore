@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voynichizer · Read a manuscript</title>
+<meta name="description" content="Read back the text hidden in a Voynichizer manuscript, with its key. Runs entirely in your browser.">
+<link rel="stylesheet" href="css/site.css">
+<script type="module" src="js/read.js"></script>
+</head>
+<body>
+<header class="masthead">
+  <a class="title" href="./"><span class="mark" aria-hidden="true">daiin</span>Voynichizer</a>
+  <nav aria-label="Pages">
+    <a href="./">Write</a><a href="read.html" aria-current="page">Read</a><a href="how.html">How it works</a><a href="research.html">Research</a><a href="about.html">About</a>
+  </nav>
+</header>
+
+<main class="folio">
+  <div class="folio-no">1v</div>
+  <div class="spread">
+    <div class="text">
+      <span class="tag" aria-hidden="true">otol.dar.shey</span>
+      <h1>Read a manuscript</h1>
+      <p class="lead">Load the manuscript file and give the key it was written with: the text comes back exactly as it
+        went in, letter for letter. With any other key there is nothing to read.</p>
+
+      <form id="form" novalidate>
+        <div class="field">
+          <span class="label">The manuscript</span>
+          <label class="drop" id="drop">
+            <input type="file" id="file" accept=".txt,text/plain">
+            <strong>Choose the .txt file</strong> or drop it here<br>
+            <span class="note" id="file-name">The PDF cannot be read back: use the text file.</span>
+          </label>
+          <details>
+            <summary>Or paste the manuscript</summary>
+            <textarea id="pasted" spellcheck="false" placeholder="@<f1r.1> tolshdar.shekaiin.daldy…"></textarea>
+          </details>
+        </div>
+        <div class="field">
+          <label for="key">Key</label>
+          <div class="key-row">
+            <input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="The key it was written with">
+            <button type="button" class="btn secondary small" id="show-key" aria-pressed="false">Show</button>
+          </div>
+        </div>
+        <div class="actions"><button class="btn" id="go" type="submit">Read the text</button></div>
+        <div class="message error" id="error" role="alert" hidden></div>
+        <p class="privacy">
+          <svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><rect x="1" y="8" width="14" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 8 V5.5 a4 4 0 0 1 8 0 V8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span>Everything happens in your browser: the manuscript and the key never leave this computer. The first
+            time, the page fetches about 27&nbsp;MB (Python and its libraries); reading takes a few seconds.</span>
+        </p>
+      </form>
+
+      <section id="working" class="scriptorium" hidden>
+        <p class="caption" id="caption" aria-live="polite">Sharpening the quill…</p>
+        <div class="progress" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" id="progress"><div id="bar"></div></div>
+        <p class="meta" id="meta">&nbsp;</p>
+      </section>
+
+      <section id="result" hidden>
+        <h2>The text</h2>
+        <textarea id="output" class="output" readonly></textarea>
+        <details class="tech">
+          <summary>Technical details</summary>
+          <div class="table-wrap"><table id="tech-table"></table></div>
+        </details>
+        <div class="actions">
+          <button class="btn" id="copy" type="button">Copy</button>
+          <a class="btn secondary" id="dl" download="voynichizer-text.txt" href="#">Download</a>
+          <button class="btn secondary" id="again" type="button">Read another</button>
+        </div>
+      </section>
+    </div>
+    <figure class="illus">
+      <img src="img/stars-f67r.jpg" width="560" height="684" alt="A sun with red and blue rays inside rings of stars, from the astronomical section of the Voynich manuscript">
+      <figcaption>Beinecke MS 408, f. 67r</figcaption>
+    </figure>
+  </div>
+</main>
+
+<footer class="colophon">
+  Voynichizer v20 · it runs entirely in your browser · drawings from Beinecke MS 408, Yale University ·
+  <a href="https://github.com/AndreottiVIII/voynichizzatore">source code</a> · MIT licence
+</footer>
+</body>
+</html>

@@ -2,3 +2,9 @@
 *.json text eol=lf
 *.ttf binary
 *.pdf binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.woff binary
+*.woff2 binary

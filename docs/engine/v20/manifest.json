@@ -1,0 +1,34 @@
+{
+ "version": "v20",
+ "commit": "261e1750b7b297fcd7572386c8453344a57e4205",
+ "pyodide": "314.0.7",
+ "packages": [
+  "numpy",
+  "scipy",
+  "scikit-learn"
+ ],
+ "pdf_packages": [
+  "matplotlib",
+  "fonttools"
+ ],
+ "files": {
+  "VoynichizzatoreEVA.ttf": "3eb86b7678ff668d4cc2b710171bfab3e992d0bae27a3ce7c280d7867d869b56",
+  "canale_sacco.py": "d498e45486aa4fe202eaff7695d0d99b5c60db6d7d6719ffa9074b64dd7d6eae",
+  "carattere.py": "b4af6bc688baebf5f362e9d6e27bced3418ac214e115d39fda89ddb7f3145f6a",
+  "disposizione.py": "dc4bb80628db567d808e670810b458def15ed61bb5aa06a74420f1614600eeb2",
+  "e135_stato_riga.py": "b3aa707a2b924be4e4fa5c3cc44e241cf87a62c4b44d6d7708e0067c7f014b40",
+  "e145_abitudini.py": "e09626f9cb182b99f2a88c8f1a48b385426422136b15f29f1f32f3cfc52cdd93",
+  "misure.py": "f8f4e62319d4a5cf73ecfe45bd20529ed55d8ca5d2163c11886c024191ff8837",
+  "modello.py": "9ac798bcce3e3af033fc599b4d9ab61ee40639c14e2e1ad851a76aa13223dae9",
+  "pagine.py": "fad2fb92eb9862eb0e940a12e3ac75c286e04e729c41777ab98ef5b10351c540",
+  "parole_nuove.py": "b2661514b19daf9e0749e77d90c0cfc0a24ee6208596364a2f083c5d8653c981",
+  "pezzi.py": "723c2d55c7cce07ded1dea5df727b7d5d39d71a26fe46f31d27bc42f6579e03c",
+  "pezzi_parametri_v20.json": "9c9616cc385360ce3b1b55c0371a9e2011b644b72a8cff68c17cf22b2958a1a7",
+  "sacco.py": "aa6033cd0838fff9e39f4612537ad4a0f403a92518a2ac622bd6964fd0824b32",
+  "trascrizione.py": "f7cea9769b82c82ddbb0ccc69f88649f4124c4d6e51458bafb39de42bbf411a1",
+  "v0.py": "babf07d0ca65095249e194ea83c5dcbb6a97437f6847f864888487996dcd4c4f",
+  "v1.py": "0f072e449089f88817f660be4e9eaa4eb2ad55b91c70cab97c872a6cf353569c",
+  "voynich_zl3b.json": "6844870a612b7ebddc913462c670b993343929c391d48ad40e3e374db502a4e5",
+  "voynichizzatore.py": "99f63964e7996a970299aacc7e1d94429c0256230fe7ca523a1cf39d13e635dd"
+ }
+}
