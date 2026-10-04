@@ -1,5 +1,5 @@
 // Talks to the engine (worker.js), which runs the program in a background thread so that the page stays responsive.
-export const VERSION = 'v20';
+export const VERSION = 'v21';
 
 let worker = null;
 let next = 0;

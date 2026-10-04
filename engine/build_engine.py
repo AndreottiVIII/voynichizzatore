@@ -28,11 +28,13 @@ def main():
         shutil.copyfile(os.path.join(RADICE, f), os.path.join(cartella, f))
         impronte[f] = hashlib.sha256(open(os.path.join(cartella, f), 'rb').read()).hexdigest()
     try:
-        commit = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=RADICE, capture_output=True, text=True).stdout.strip()
+        # the last commit that touched the program (not the site in docs/)
+        commit = subprocess.run(['git', 'log', '-1', '--no-merges', '--format=%H', '--', '.', ':!docs'], cwd=RADICE,
+                                capture_output=True, text=True).stdout.strip()
     except OSError:
         commit = ''
     manifesto = {'version': versione, 'commit': commit, 'pyodide': PYODIDE,
-                 'packages': ['numpy', 'scipy', 'scikit-learn'], 'pdf_packages': ['matplotlib', 'fonttools'],
+                 'packages': ['numpy', 'scipy', 'scikit-learn'],
                  'files': impronte}
     with open(os.path.join(cartella, 'manifest.json'), 'w', encoding='utf-8', newline='\n') as out:
         json.dump(manifesto, out, indent=1)

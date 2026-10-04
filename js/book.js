@@ -276,10 +276,10 @@ export async function makePdf(pages, sections, onProgress) {
   await loadScript('js/vendor/jspdf.umd.min.js');
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'pt', format: [PAGE.w, PAGE.h], compress: true });
-  const ttf = await fetch('engine/v20/VoynichizzatoreEVA.ttf').then((r) => r.arrayBuffer());
+  const ttf = await fetch('engine/v21/VoynichizzatoreEVA.ttf').then((r) => r.arrayBuffer());
   doc.addFileToVFS('VoynichizzatoreEVA.ttf', base64(ttf));
   doc.addFont('VoynichizzatoreEVA.ttf', 'Voynich', 'normal');
-  doc.setProperties({ title: 'Voynich II', subject: 'A manuscript written by the Voynichizer', creator: 'Voynichizer v20' });
+  doc.setProperties({ title: 'Voynich II', subject: 'A manuscript written by the Voynichizer', creator: 'Voynichizer v21' });
   const bg = await pageBackground(PDF_PX);
   const bgData = bg.toDataURL('image/jpeg', 0.82);
   const states = [0.8, 0.84, 0.88, 0.92, 0.96].map((op) => new doc.GState({ opacity: op }));
