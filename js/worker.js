@@ -130,6 +130,12 @@ function message(e) {
 async function serve(m) {
   await init();
   if (m.cmd === 'init') return { version: VERSION, pyodide: manifest.pyodide, commit: manifest.commit, pages };
+  if (m.cmd === 'need') {
+    // exact size of the message: UTF-8 bytes, zlib level 9 (the program's own compression), plus the 12-byte frame
+    py.globals.set('_t', m.text);
+    const r = py.runPython('import zlib as _z\n_b = _t.encode("utf-8")\n[len(_b), len(_z.compress(_b, 9))]').toJs();
+    return { utf8: r[0], compressed: r[1], bits: 8 * (12 + r[1]) };
+  }
   if (m.cmd === 'bits') {
     py.globals.set('_t', m.text); py.globals.set('_k', m.key);
     return { bits: py.runPython('bit_necessari(_t, _k)') };
