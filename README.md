@@ -38,26 +38,26 @@ takes a couple of minutes; reading it back takes a few seconds.
 
 ## How close it is to the Voynich (measurements, with their limits)
 
-Measured by hiding the same Latin text with 12 different keys. The "judges" are two classifiers that try to tell
+Measured by hiding the same Latin text with 24 different keys. The "judges" are two classifiers that try to tell
 generated pages from real ones by looking at about 220 page statistics: 0.5 means they are guessing, 1 that they never
 fail.
 
 | measure | value |
 |---|---|
-| judge 1 (statistics of glyphs, words, lines) | 0.55 ± 0.01 |
-| judge 2 (plus: word pairs, position in the line, first lines, page profile) | 0.60 ± 0.01 |
+| judge 1 (statistics of glyphs, words, lines) | 0.56 ± 0.01 |
+| judge 2 (plus: word pairs, position in the line, first lines, page profile) | 0.61 ± 0.01 |
 | scorecard of 18 properties of the text (17 attainable: the Voynich itself fails one when measured the same way) | 15 to 16 |
 | 8 further properties | 5 to 6 |
 | lines much wider than the others on their page (over 1.5 times the median; Voynich 2.9%) | 2.8% |
 | lines somewhat wider (over 1.25 times the median; Voynich 6.0%) | 11.5% |
-| the text comes back exactly | 12 times out of 12 |
-| wrong key rejected | 12 times out of 12 |
+| the text comes back exactly | 24 times out of 24 |
+| wrong key rejected | 24 times out of 24 |
 
 A manuscript with a message and one without cannot be told apart by these measures.
 
 **What this does NOT mean.** It is not "indistinguishable from the Voynich":
 
-- the second judge still recognises it a little (about one key in two gives a manuscript above 0.60);
+- the second judge still recognises it a little (about two keys in three give a manuscript above 0.60);
 - some known properties never come out right: the width of the lines (see the table), the page profile, the spelling choices agreeing within a line as
   measured on 12 classes, the similarity between words of the same line (a little too high);
 - the model was tuned on the same statistics these judges look at; a judge built independently has not been tried;
