@@ -8,7 +8,6 @@ const ENGINE = new URL('../engine/' + VERSION + '/', self.location.href).href;
 const DIR = '/engine/' + VERSION;
 let py = null;
 let manifest = null;
-let pdfReady = false;
 let pages = [];                // folio names, in order
 let current = null;            // id of the request being served (for progress messages sent from Python)
 
@@ -152,18 +151,6 @@ async function serve(m) {
     py.globals.set('_m', m.manuscript); py.globals.set('_k', m.key);
     return { text: py.runPython('leggi(_m, _k)') };
   }
-  if (m.cmd === 'pdf') {
-    if (!pdfReady) {
-      progress({ phase: 'pdf-load' });
-      await py.loadPackage(manifest.pdf_packages, { messageCallback: () => {} });
-      pdfReady = true;
-    }
-    progress({ phase: 'pdf' });
-    py.FS.writeFile('/tmp/for_pdf.txt', m.manuscript, { encoding: 'utf8' });
-    py.runPython(`import pagine; pagine.pdf('/tmp/for_pdf.txt', '/tmp/book.pdf', stampa=False)`);
-    const bytes = py.FS.readFile('/tmp/book.pdf');
-    return { pdf: bytes };
-  }
   throw new Error('unknown command ' + m.cmd);
 }
 
@@ -174,7 +161,7 @@ self.onmessage = (e) => {
     current = m.id;
     try {
       const out = await serve(m);
-      postMessage({ id: m.id, type: 'done', ...out }, out.pdf ? [out.pdf.buffer] : []);
+      postMessage({ id: m.id, type: 'done', ...out });
     } catch (err) {
       postMessage({ id: m.id, type: 'error', message: message(err) });
     }

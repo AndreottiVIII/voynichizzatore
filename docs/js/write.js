@@ -2,6 +2,7 @@
 import { prepare, call, reset } from './engine.js';
 import { Scribe } from './scribe.js';
 import { parseManuscript, renderPage } from './glyphs.js';
+import { loadAssets, layout, drawPage, makePdf as bookPdf, PAGE } from './book.js';
 import { $, CAPACITY, CAPACITY_MAX, minutes, showKey, error, LOADING, explain } from './common.js';
 
 const PAGES = 207;
@@ -219,16 +220,22 @@ function finish(out, info, wantPdf, ms, started) {
   if (wantPdf) makePdf(book);
 }
 
+// sections of the folios (H herbal, S recipes, B biological, P pharmaceutical, C cosmological, A astronomical, T text)
+let sections = null;
+const sectionMap = () => sections || (sections = fetch('book/sections.json').then((r) => r.json()));
+
 async function makePdf(b) {
-  $('pdf-note').textContent = 'Binding the book… (the first time it fetches about 10 MB more)';
+  $('pdf-note').textContent = 'Binding the book…';
   try {
-    const out = await call('pdf', { manuscript: b.manuscript });
+    const blob = await bookPdf(b.pages, await sectionMap(), (n, tot) => {
+      if (b === book) $('pdf-note').textContent = 'Binding the book: page ' + n + ' of ' + tot + '…';
+    });
     if (b !== book) return;
-    b.pdfUrl = URL.createObjectURL(new Blob([out.pdf], { type: 'application/pdf' }));
+    b.pdfUrl = URL.createObjectURL(blob);
     $('dl-pdf').href = b.pdfUrl;
     $('dl-pdf').hidden = false;
-    $('pdf-note').textContent = b.pages.length + ' pages, ' + (out.pdf.byteLength / 1048576).toFixed(1) +
-      ' MB. For looking at, not for reading back.';
+    $('pdf-note').textContent = b.pages.length + ' pages, ' + (blob.size / 1048576).toFixed(1) +
+      ' MB, with the drawings of the Voynich. For looking at, not for reading back.';
   } catch (err) {
     $('pdf-note').textContent = 'The PDF could not be made: ' + err.message;
   }
@@ -238,8 +245,14 @@ function show(k) {
   if (!book) return;
   shown = Math.max(0, Math.min(book.pages.length - 1, k));
   $('folio').value = String(shown);
-  renderPage($('page'), book.pages[shown], mode);
-  realFolio(book.pages[shown].folio);
+  const page = book.pages[shown];
+  if (mode === 'eva') {
+    $('page').classList.remove('illustrated');
+    renderPage($('page'), page, 'eva');
+  } else {
+    drawIllustrated(page);
+  }
+  realFolio(page.folio);
 }
 $('prev').addEventListener('click', () => show(shown - 1));
 $('next').addEventListener('click', () => show(shown + 1));
@@ -297,4 +310,29 @@ async function fileNames(manuscript) {
     id = [...new Uint8Array(h)].slice(0, 4).map((b) => b.toString(16).padStart(2, '0')).join('');
   } catch (e) { /* digest unavailable: time-based id */ }
   return 'voynich-II_' + day + '_' + id;
+}
+
+// The folio as it will be in the PDF: vellum, the drawing, the text in ink (same layout as the PDF)
+async function drawIllustrated(page) {
+  const box = $('page');
+  box.classList.add('illustrated');
+  let c = box.querySelector('canvas');
+  if (!c) {
+    box.replaceChildren();
+    c = document.createElement('canvas');
+    c.setAttribute('role', 'img');
+    box.append(c);
+  }
+  c.setAttribute('aria-label', 'Folio ' + page.folio + ' of the generated book, with its drawing');
+  const w = Math.max(200, box.clientWidth);
+  c.width = Math.round(w * (window.devicePixelRatio || 1));
+  c.height = Math.round(c.width * PAGE.h / PAGE.w);
+  try {
+    const a = await loadAssets();
+    const lay = layout(a, page, (await sectionMap())[page.folio] || 'H');
+    if (book && book.pages[shown] === page) await drawPage(c, lay);
+  } catch (e) {
+    box.classList.remove('illustrated');
+    renderPage(box, page, 'script');
+  }
 }
