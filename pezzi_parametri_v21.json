@@ -52,9 +52,10 @@
     0.11639510912662981,
     0.3307579212775004
    ]
-  ]
+  ],
+  "conti_iniziali": true
  },
- "origine": "v19 con il peso della somiglianza a distanza 2 regolato di nuovo sull'alternanza nella riga (e417)",
+ "origine": "v20 con i conteggi delle scelte di riga inizializzati (e418)",
  "gamma": 0.9757949118833754,
  "cifra": "scrypt",
  "impaginazione": "statistica"
