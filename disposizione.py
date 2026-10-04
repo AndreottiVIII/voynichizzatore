@@ -296,6 +296,32 @@ class Disposizione:
                 conti[B][c][v] -= 1
                 conti[A][c][v] += 1
             return pesata(A, B, toccate) - prima
+        # e416: larghezza delle righe in caratteri. Ogni riga di n parole ha una larghezza attesa proporzionale a n ** beta
+        # (beta misurato sul Voynich; il totale dei caratteri della pagina e' conservato); l'energia punisce il quadrato
+        # dello scarto. La larghezza di una parola e' il numero dei suoi caratteri EVA piu' uno spazio.
+        wl = pesi.get('larghezza', 0.0) if strato == 'D3' else 0.0
+        if wl:
+            lung = [0] * len(righe)
+            for t, w in enumerate(arr):
+                lung[riga_di[t]] += len(w) + 1
+            attesa = [len(ps) ** pesi.get('larghezza_beta', 1.0) for _, ps in righe]
+            if pesi.get('larghezza_curva'):
+                # e416b: la larghezza attesa segue una curva misurata sul Voynich (nodi: log parole su mediana di pagina ->
+                # log larghezza su mediana di pagina), lineare fra i nodi e piatta fuori
+                import statistics
+                xs, ys = pesi['larghezza_curva']
+                med = statistics.median(len(ps) for _, ps in righe)
+
+                def f(x):
+                    if x <= xs[0]:
+                        return ys[0]
+                    for k in range(1, len(xs)):
+                        if x <= xs[k]:
+                            return ys[k - 1] + (ys[k] - ys[k - 1]) * (x - xs[k - 1]) / (xs[k] - xs[k - 1])
+                    return ys[-1]
+                attesa = [math.exp(f(math.log(len(ps) / med))) for _, ps in righe]
+            fattore = sum(lung) / sum(attesa)
+            attesa = [a * fattore for a in attesa]
         if N >= 2:
             for _ in range(passate * N):
                 i, j = rnd.randrange(N), rnd.randrange(N)
@@ -313,13 +339,24 @@ class Disposizione:
                     a, b = (i, j) if meta_di[i] == 0 else (j, i)
                     dm, e = cambio_meta(arr[b], arr[a])
                     d += e
+                dl = 0
+                if wl and riga_di[i] != riga_di[j]:
+                    dl = len(arr[i]) - len(arr[j])          # la riga di i cresce di dl, quella di j cala di dl
+                    if dl:
+                        A, B = riga_di[i], riga_di[j]
+                        d -= wl * ((lung[A] + dl - attesa[A]) ** 2 + (lung[B] - dl - attesa[B]) ** 2
+                                   - (lung[A] - attesa[A]) ** 2 - (lung[B] - attesa[B]) ** 2)
                 if d < 0 and rnd.random() >= math.exp(d):
                     if mosse:
                         sposta(arr[i], riga_di[i], arr[j], riga_di[j])
                     arr[i], arr[j] = arr[j], arr[i]
-                elif dm is not None:
-                    for g, k in dm.items():
-                        diff[g] += 2 * k
+                else:
+                    if dm is not None:
+                        for g, k in dm.items():
+                            diff[g] += 2 * k
+                    if dl:
+                        lung[riga_di[i]] += dl
+                        lung[riga_di[j]] -= dl
         out, k = [], 0
         for ini, ps in righe:
             out.append((ini, arr[k:k + len(ps)]))

@@ -33,7 +33,8 @@ takes a couple of minutes; reading it back takes a few seconds.
   paragraphs) and a few weak links between neighbouring words. It carries no information: to read the message you only
   need the words of each page and the key.
 - **The layout** of each page (how many lines, how many words per line, where paragraphs start) is drawn from the
-  statistics of the Voynich: no page has the layout of a real page.
+  statistics of the Voynich: no page has the layout of a real page. The words are then arranged so that the width of
+  each line in characters behaves as in the Voynich, where lines with more words have shorter words.
 
 ## How close it is to the Voynich (measurements, with their limits)
 
@@ -43,10 +44,12 @@ fail.
 
 | measure | value |
 |---|---|
-| judge 1 (statistics of glyphs, words, lines) | 0.56 ± 0.01 |
+| judge 1 (statistics of glyphs, words, lines) | 0.55 ± 0.01 |
 | judge 2 (plus: word pairs, position in the line, first lines, page profile) | 0.60 ± 0.01 |
-| scorecard of 18 properties of the text (17 attainable: the Voynich itself fails one when measured the same way) | 15 |
-| 8 further properties | about 6 |
+| scorecard of 18 properties of the text (17 attainable: the Voynich itself fails one when measured the same way) | 15 to 16 |
+| 8 further properties | 5 to 6 |
+| lines much wider than the others on their page (over 1.5 times the median; Voynich 2.9%) | 2.8% |
+| lines somewhat wider (over 1.25 times the median; Voynich 6.0%) | 11.5% |
 | the text comes back exactly | 12 times out of 12 |
 | wrong key rejected | 12 times out of 12 |
 
@@ -55,7 +58,7 @@ A manuscript with a message and one without cannot be told apart by these measur
 **What this does NOT mean.** It is not "indistinguishable from the Voynich":
 
 - the second judge still recognises it a little (about one key in two gives a manuscript above 0.60);
-- some known properties never come out right: the page profile, the spelling choices agreeing within a line as
+- some known properties never come out right: the width of the lines (see the table), the page profile, the spelling choices agreeing within a line as
   measured on 12 classes, the similarity between words of the same line (a little too high);
 - the model was tuned on the same statistics these judges look at; a judge built independently has not been tried;
 - almost all words are Voynich words: anyone who knows the program can tell that a manuscript was made with the
@@ -68,6 +71,8 @@ A manuscript with a message and one without cannot be told apart by these measur
 - These are standard building blocks, but the whole **has not been reviewed by an expert**: do not use it for real
   secrets. Security depends on the key: use a long passphrase, not a dictionary word.
 - Writing and reading use floating-point computations: use the same version of the program to write and to read.
+  (This is v20. Manuscripts written with the previous published version, v17, are read by this one: the two differ
+  only in how the words are arranged on the page, which carries no information.)
   Reading a manuscript on a computer other than the one that wrote it has not been verified yet (see the test below).
 
 ## Read-back test on another computer

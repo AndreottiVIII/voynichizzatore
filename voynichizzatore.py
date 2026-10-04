@@ -10,7 +10,7 @@ choice of the words on each page; with the key, the text comes back exactly.
 import argparse, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-VERSIONE = 'v17'
+VERSIONE = 'v20'
 ALIAS = {'codifica': 'encode', 'decodifica': 'decode', 'vuoto': 'empty'}
 
 
