@@ -18,7 +18,7 @@ takes a couple of minutes; reading it back takes a few seconds.
 - The manuscript is EVA text. The `pdf` command then writes it out as a book, one page per page, in a Voynich-like
   script: the font `VoynichizzatoreEVA.ttf` was drawn for this project by a program (`carattere.py`), stroke by stroke;
   it imitates the shapes of the Voynich signs and is not a copy of any existing font. The PDF has text only, no drawings.
-- It holds about 80,000 bits, i.e. roughly 20,000 characters of text after compression. If the text is longer, the
+- It holds between about 80,000 and 85,000 bits depending on the key, i.e. roughly 20,000 characters of text after compression. If the text is longer, the
   program says so. If it is shorter, the rest of the book is filled so that you cannot see where the message ends.
 
 ## How it works, briefly
@@ -44,12 +44,12 @@ fail.
 
 | measure | value |
 |---|---|
-| judge 1 (statistics of glyphs, words, lines) | 0.56 ± 0.01 |
-| judge 2 (plus: word pairs, position in the line, first lines, page profile) | 0.61 ± 0.01 |
-| scorecard of 18 properties of the text (17 attainable: the Voynich itself fails one when measured the same way) | 15 to 16 |
+| judge 1 (statistics of glyphs, words, lines) | 0.55 ± 0.01 |
+| judge 2 (plus: word pairs, position in the line, first lines, page profile) | 0.60 ± 0.01 |
+| scorecard of 18 properties of the text (17 attainable: the Voynich itself fails one when measured the same way) | 16 |
 | 8 further properties | 5 to 6 |
 | lines much wider than the others on their page (over 1.5 times the median; Voynich 2.9%) | 2.8% |
-| lines somewhat wider (over 1.25 times the median; Voynich 6.0%) | 11.5% |
+| lines somewhat wider (over 1.25 times the median; Voynich 6.0%) | 11.6% |
 | the text comes back exactly | 24 times out of 24 |
 | wrong key rejected | 24 times out of 24 |
 
@@ -57,9 +57,9 @@ A manuscript with a message and one without cannot be told apart by these measur
 
 **What this does NOT mean.** It is not "indistinguishable from the Voynich":
 
-- the second judge still recognises it a little (about two keys in three give a manuscript above 0.60);
+- the second judge still recognises it a little (more than half of the keys give a manuscript above 0.60);
 - some known properties never come out right: the width of the lines (see the table), the page profile, the spelling choices agreeing within a line as
-  measured on 12 classes, the similarity between words of the same line (a little too high);
+  measured on 12 classes;
 - the model was tuned on the same statistics these judges look at; a judge built independently has not been tried;
 - almost all words are Voynich words: anyone who knows the program can tell that a manuscript was made with the
   program. What they cannot tell is whether there is a message inside.
@@ -71,8 +71,9 @@ A manuscript with a message and one without cannot be told apart by these measur
 - These are standard building blocks, but the whole **has not been reviewed by an expert**: do not use it for real
   secrets. Security depends on the key: use a long passphrase, not a dictionary word.
 - Writing and reading use floating-point computations: use the same version of the program to write and to read.
-  (This is v20. Manuscripts written with the previous published version, v17, are read by this one: the two differ
-  only in how the words are arranged on the page, which carries no information.)
+  (This is v21. Manuscripts written with the previous published versions, v17 and v20, are read by this one: they
+  differ only in how the words are arranged on the page, which carries no information. v21 corrects a defect of the
+  earlier versions in the arrangement: the per-line counts of the spelling choices were never initialised.)
   Reading a manuscript on a computer other than the one that wrote it has not been verified yet (see the test below).
 
 ## Read-back test on another computer
