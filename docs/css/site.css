@@ -317,6 +317,21 @@ summary { cursor: pointer; color: var(--ink-soft); font-style: italic; }
 .drop strong { color: var(--ink); font-weight: 600; }
 .drop input { display: none; }
 .output { min-height: 220px; white-space: pre-wrap; }
+.file-status { margin: 10px 0 0; font-size: 17px; min-height: 0; }
+.file-status:empty { display: none; }
+.file-status.ok { color: var(--green); padding: 8px 12px; border-left: 3px solid var(--green); background: rgba(240, 248, 230, .45); }
+.file-status.bad { color: var(--error); padding: 8px 12px; border-left: 3px solid var(--error); background: rgba(255, 240, 230, .45); }
+/* research page */
+.subtitle { font-size: 22px; font-style: italic; color: var(--ink-soft); margin: -6px 0 14px; }
+.byline { font-size: 19px; margin-bottom: 22px; }
+.byline .aff { color: var(--ink-soft); font-size: .9em; }
+.download.paper { margin: 6px 0 26px; }
+.abstract p { text-align: justify; hyphens: auto; }
+ol.findings { padding-left: 1.6em; }
+ol.findings li { margin-bottom: 10px; }
+ol.findings li::marker { color: var(--red); font-weight: 600; }
+code.eva { font-family: var(--mono); font-size: .82em; background: none; border: 0; padding: 0; color: var(--red-deep); }
+.cite { padding: 10px 14px; border-left: 3px solid var(--ink-faint); background: var(--field); }
 .soon { text-align: center; padding: 10px 0 20px; font-size: 24px; font-style: italic; color: var(--ink-soft); }
 .totop {
   position: fixed;
