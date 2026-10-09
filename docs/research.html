@@ -41,7 +41,7 @@
     <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.</span></p>
 
   <div class="download paper">
-    <div><strong>The paper</strong><p class="note" id="paper-size">PDF, in English. CC BY 4.0.</p></div>
+    <div><strong>The paper</strong><p class="note">PDF, 38 pages, 347 KB, in English. CC BY 4.0.</p></div>
     <a class="btn" href="research/Caniatti_2026_Hiding_a_message_in_a_Voynich-like_book_v2.pdf" download>Download the PDF</a>
   </div>
   <p class="note paper-links">The research record, with every preregistration, program, result and the laboratory
@@ -58,28 +58,27 @@
   <h2 id="abstract">Abstract</h2>
   <div class="abstract">
     <p>We studied how the text of the Voynich manuscript (Beinecke MS 408) is written, in 716 logged experiments, 670 of
-      them preregistered: hypothesis and criterion were fixed before the run, the code was tested first on synthetic
-      texts, and each finding was set against the same measurement in 24 natural languages, constructed languages,
-      volunteers’ gibberish, published generators and ciphers and, where scribal habits were at issue, 79 medieval
-      manuscripts (six Nordic, 73 German).</p>
-    <p>The measurements quantify regularities described before (word boundaries marked redundantly by word form, the
-      dependency between adjacent words and its stop at the line break, line-edge forms, paragraph-initial gallows,
-      copying from the line above) and add some that, to our knowledge, are new: the dependency between adjacent words
-      mirrors the glyph sequences inside words; immediate repetition is not avoided, unlike in every language and
-      manuscript compared; each line avoids starting like the line above, and marked variants drift along the line,
-      both beyond anything in the medieval scribes measured. Eighteen of the measured properties form a scorecard.</p>
-    <p>From the scorecard we built the <em>voynichizer</em>, which hides any text of up to about 20,000 characters in a
-      Voynich-like book of 207 pages. The text is compressed, encrypted and authenticated with a key; through an
-      arithmetic decoder its bits decide only how many times each recurring Voynich word appears on each page, while
-      layout, invented words and word order follow the measured rules. On 24 keys, two classifiers retrained on each book
-      separate its pages from the real ones with AUC 0.55 and 0.60 (0.5 is chance; the second gives 0.60 also to the real
-      manuscript with its lines shuffled), and the books pass 16 of the 17 attainable scorecard properties.</p>
+      them preregistered (hypothesis and criterion fixed before the run, code tested first on synthetic texts), and
+      compared each finding with the same measurement in 24 natural languages, constructed languages, volunteers’
+      gibberish, published generators and ciphers and, for scribal habits, 79 medieval manuscripts.</p>
+    <p>The measurements quantify regularities described before (word boundaries marked redundantly by word form, a
+      dependency between adjacent words that stops at the line break, line-edge forms, paragraph-initial gallows, copying
+      from the line above) and add two that are, to our knowledge, new: the dependency between adjacent words mirrors the
+      glyph sequences inside words, and immediate repetition is not avoided, unlike in every language and manuscript
+      compared. Two properties described before for parts of the manuscript, the avoidance of starting a line like the
+      line above and the drift of marked variants along the line, are measured across the whole text and exceed anything
+      found in the medieval scribes.</p>
+    <p>From eighteen of these properties we built the <em>voynichizer</em>, which hides any text of up to about 20,000
+      characters in a Voynich-like book of 207 pages: the text is compressed, encrypted and authenticated with a key, and
+      its bits decide only how many times each recurring word appears on each page. On 24 keys, two classifiers retrained
+      on each book separate its pages from the real ones with AUC 0.55 and 0.60 (0.5 is chance), and the books pass 16 of
+      the 17 attainable properties.</p>
     <p>That a Voynich-like text can carry a real message had been shown at the level of words, most fully by the Naibbe
-      cipher (Greshko, 2025). We demonstrate it again, with a different mechanism and two stricter conditions: the book
-      also follows the line, paragraph and page rules, and a book with a message is a sample of the same distribution as
-      a book without one (a classifier trained to tell them apart scores AUC 0.51), while the key recovers the text
-      exactly. The regularities we measured therefore describe how the manuscript was written, but they cannot tell
-      whether it contains a message: a text that follows them can carry one or not, and the two cases look the same.</p>
+      cipher (Greshko, 2025). We show it again, with a modern construction and two stricter conditions: the book also
+      follows most of the line, paragraph and page rules, and a book with a message cannot be told from one without (a
+      classifier trained to separate them scores AUC 0.51), while the key recovers the text exactly. The regularities we
+      measured therefore describe how the manuscript was written, but they cannot tell whether it contains a message: a
+      text that follows most of them can carry one or not, and the two cases look the same.</p>
   </div>
 
   <h2 id="question">The question</h2>
@@ -97,7 +96,8 @@
     drive an arithmetic decoder that samples how many times each recurring Voynich word occurs on each page. Everything
     else (layout, invented words, word order) follows the manuscript’s statistics and carries no information. The method
     of feeding encrypted bits to an arithmetic decoder to sample from a model is that of Ziegler, Deng and Rush (2019);
-    what is new is a cover model of one whole historical book, evaluated against the measured properties of that book.
+    to our knowledge no earlier tool combines a cover model of a whole historical book, distribution-preserving embedding
+    and authenticated encryption, evaluated against the measured properties of that book.
     <a href="how.html">How it works</a> describes it step by step.</p>
   <p>Version 21 was run with 24 keys on the same Latin text (the opening of Isidore’s <em>Etymologiae</em> XVII,
     38,304 bits). Keys 1–12 were also used during development; keys 13–24 never were.</p>
@@ -115,12 +115,16 @@
     second judge the generated books are therefore at the level of the real text without its line order. They always
     miss the page profile (how far each page departs from its section) and usually the spelling choices that vary from
     line to line, the register of the first lines of paragraphs and the spread of word lengths; their lines are too
-    irregular in width.</p>
+    irregular in width. These judges do not look at the vocabulary: one that checked whether each word occurs in the
+    manuscript would separate the books at once, since invented words never do. For reference, the published generators
+    pass from 1 to 10 of the 18 properties of the same scorecard.</p>
   <p><strong>With and without a message.</strong> For each key a second book was written with filler bits only. Against
     the manuscript the two kinds score the same (paired differences −0.009 ± 0.008 and −0.007 ± 0.010), and a classifier
     trained directly to separate their pages (228 features, 9,420 pages) scores AUC 0.506, against 0.511 for a negative
     control. This holds by construction, whatever the judge, as long as the cipher is sound: the message enters only as
-    encrypted bits, which look like the random filler of a book without a message.</p>
+    encrypted bits, which no efficient test can tell from the random filler of a book without a message. The security is
+    therefore computational, resting on SHAKE-256 as a pseudorandom generator. The construction is modern (arithmetic
+    coding, current cryptography) and says nothing about how a fifteenth-century writer could have hidden a message.</p>
 
   <h2 id="rules">2. The writing rules, measured</h2>
   <p>Each property is measured with its 95% interval (by bifolium) and set against the same measure in the comparison
@@ -155,8 +159,9 @@
       <span class="prior">The link was observed by Currier (1976), Smith (2017) and Smith and Ponzi (2019). The mirroring of
       the rules inside words is added here.</span></li>
     <li><strong>The line is a closed unit.</strong> Between the last word of a line and the first of the next the link is
-      zero (−0.003 bits), against 0.19 inside the line; in the comparison languages, with prose cut into lines, the ratio
-      of the two has a median of 0.49 and only Hebrew falls below 0.10. The link also drops where a plant interrupts a
+      zero (−0.003 bits), against 0.19 inside the line. In the comparison languages the ratio of the two has a median of
+      0.49 and only Hebrew falls below 0.10, but their lines are those of printed editions, not of manuscripts, so they
+      are a weak reference here. The link also drops where a plant interrupts a
       line (from 0.167 to 0.026 bits). Lines have edge forms: for the same rest of the word, at line end
       <code class="eva">-m</code> gains 15 points and <code class="eva">-r</code> loses 12 (<code class="eva">dar</code>
       inside a line, <code class="eva">dam</code> at its end); at line start <code class="eva">s-</code> and
@@ -203,7 +208,7 @@
       (<code class="eva">chol chol</code>), 3.9% nearly identical. Against the composition of each line the Voynich repeats
       the previous word as often as chance (ratio 1.04), whereas every comparison text avoids it: languages 0.01–0.92,
       Nordic scribes 0.02–0.07, German manuscripts at most 0.79, the Copiale copyist 0. Fifteenth-century German herbals,
-      recipe books and astrology texts repeat 7–30 times less, so it does not come from genre. Version 1 read this as
+      recipe books and astrology texts avoid it too (0.05–0.51), so it does not come from genre. Version 1 read this as
       repetition beyond chance; the corrected reading is that it is not avoided, and that repeated words cluster in the
       same line.
       <span class="prior">The rate was measured by Boxer (2023) and by Bowern and Lindemann (2021).</span></li>
@@ -236,8 +241,8 @@
       0.79; Copiale 0</td><td>avoided by every scribe</td></tr>
     <tr><td>drift along the line (per ten glyphs)</td><td>−0.020 to −0.034</td><td>at most 0.008, in no common
       direction</td><td>absent with power in 20 of 29 choices</td></tr>
-    <tr><td>short state of choices (2–3 words)</td><td>+0.09</td><td>absent with power in 14 of 29 choices; not measurable
-      in 13; present in 2 (one uncertain); the Copiale copyist rotates homophones (−0.18)</td><td>weaker or absent; not
+    <tr><td>short state of choices (2–3 words)</td><td>+0.09</td><td>absent with power in 14 of 29 choices; power
+      insufficient in 13; present in 2 (one uncertain); the Copiale copyist rotates homophones (−0.18)</td><td>weaker or absent; not
       established as unique</td></tr>
     <tr><td>slow state between consecutive lines</td><td>+0.050</td><td>6 of 17 choices, 5 as large as the
       Voynich</td><td>normal in handwriting</td></tr>
@@ -271,8 +276,11 @@
     or independently built judge would probably do better. Together they mean that a text written under the rules
     measured here can carry a message, and that whether it does cannot be read from its statistics. This does not show
     that the manuscript carries a message, any more than generators without a message show that it does not: the debate
-    between “meaningless” and “enciphered” will not be settled by the statistics of the text alone.</p>
-  <p><strong>Excluded</strong>, with the controls described: a natural language in an ordinary alphabet read with a simple
+    between “meaningless” and “enciphered” will not be settled by the statistics of the text alone. What is specific to
+    the Voynich here is not the indistinguishability, which any cover would give with a good cipher, but the capacity at
+    a given distance from the manuscript: about 83,000 bits per book at AUC 0.55 and 0.60 with these judges, a lower
+    bound that a better model could raise.</p>
+  <p><strong>Not supported</strong>, with the controls described: a natural language in an ordinary alphabet read with a simple
     or homophonic substitution, in the languages tested; the published readings tested; the historical mechanisms
     simulated, one at a time; a text invented by hand without rules; and the idea that the rules are the ordinary habits
     of the 79 manuscripts measured.</p>
@@ -294,12 +302,13 @@
       timestamps; the programme was exploratory, and confirmations on data not used to form a hypothesis are few.</li>
     <li>Everything rests on transliterations that share the line segmentation; the images were checked only on a
       sample.</li>
-    <li>Comparison manuscripts are Old Norse and Early New High German only; the 24 languages have lines made by cutting
-      prose; only one real enciphered manuscript (the Copiale) was available.</li>
+    <li>Comparison manuscripts are Old Norse and Early New High German only; the lines of the 24 languages are those of
+      their source editions, not of manuscripts; only one real enciphered manuscript (the Copiale) was available.</li>
     <li>Three planned tests could not be run because their measures did not separate the cases on synthetic texts.</li>
     <li>The judges and the scorecard are the project’s own and the generator was tuned against them; an independently
-      built judge has not been tried, keys 1–12 were used during development, and the encryption has not been reviewed by
-      a cryptographer.</li>
+      built judge has not been tried (the books of the 24 keys, the keys and the code are public, and one built by others
+      would be welcome); keys 1–12 were used during development; the encryption has not been reviewed by a
+      cryptographer.</li>
     <li>Several effects are small in absolute terms (the short state is about 13 points of agreement), and the look-ahead
       and the drift of single choices other than <code class="eva">sh/ch</code> do not survive the strictest multiplicity
       correction.</li>
@@ -314,6 +323,11 @@
     numbers. Code is under the MIT licence; texts, results and figures under CC BY 4.0. Copyright-protected corpora are
     not included and must be downloaded from their sources. The notebook also records the provisional readings that later
     checks corrected.</p>
+  <p>The work was carried out in a continuous conversation with Claude, a large language model by Anthropic, which
+    proposed experiments, wrote the preregistrations, the analysis programs and the notebook entries, ran the experiments
+    and drafted the text; the voynichizer was developed in the same way. The author set the questions and the direction of
+    the research, chose among the avenues proposed, approved every data download and change of scope, and reviewed
+    results and text (Section 4.5 of the paper).</p>
 
   <h2 id="cite">How to cite</h2>
   <p class="cite">Caniatti, D. (2026). <em>Hiding a Message in a Voynich-like Book: the manuscript’s writing rules,
