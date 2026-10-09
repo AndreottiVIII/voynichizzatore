@@ -325,7 +325,9 @@ summary { cursor: pointer; color: var(--ink-soft); font-style: italic; }
 .subtitle { font-size: 22px; font-style: italic; color: var(--ink-soft); margin: -6px 0 14px; }
 .byline { font-size: 19px; margin-bottom: 22px; }
 .byline .aff { color: var(--ink-soft); font-size: .9em; }
-.download.paper { margin: 6px 0 26px; }
+.download.paper { margin: 6px 0 8px; }
+.paper-links { margin: 0 0 26px; }
+ol.findings .prior { display: block; margin-top: 4px; font-size: .9em; font-style: italic; color: var(--ink-soft); }
 .abstract p { text-align: justify; hyphens: auto; }
 ol.findings { padding-left: 1.6em; }
 ol.findings li { margin-bottom: 10px; }
