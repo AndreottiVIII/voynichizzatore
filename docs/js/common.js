@@ -1,6 +1,6 @@
 // Small helpers shared by the pages.
 export const $ = (id) => document.getElementById(id);
-export const CAPACITY = 80000;      // bits a book carries at the least: 80,000-85,000 depending on the key (tests: 80,344-84,678)
+export const CAPACITY = 80000;      // bits a book carries at the least: about 80,000-86,000 depending on the key (paper: 81,100-85,900; site tests: 80,344-84,678)
 export const CAPACITY_MAX = 86000;  // above this a text never fits
 
 export function minutes(ms) {

@@ -89,9 +89,11 @@
     that statistics seems well placed to answer: is the text a meaningful message (a language, perhaps enciphered) or the
     meaningless product of a procedure? The paper asks whether regularities, however many and however strong, can decide
     it at all. Steganography gives the answer in principle: if texts with and without a message are samples of the same
-    distribution, no test on the text can tell them apart (Cachin, 1998). The question then becomes constructive: can one
-    build a book that follows the measured writing rules of the Voynich, at the level of the line, the paragraph and the
-    page as well as the word, and that carries a message or not, with the two cases indistinguishable by construction?</p>
+    distribution, no test on the text can tell them apart (Cachin, 1998). The question then becomes constructive. For the
+    statistics of words it had already been answered: hand ciphers turn real Latin into Voynich-like text that can be
+    read back (Greshko, 2025). The paper asks it for the whole set of measured rules: can one build a book that follows
+    the writing rules of the Voynich at the level of the line, the paragraph and the page as well as the word, and that
+    carries a message or not, with the two cases indistinguishable by construction?</p>
 
   <h2 id="generator">1. The generator: a Voynich-like book that carries a message</h2>
   <p>The voynichizer, which this site runs, turns any text of up to about 20,000 characters into a 207-page book in EVA
@@ -103,7 +105,9 @@
     and authenticated encryption, evaluated against the measured properties of that book.
     <a href="how.html">How it works</a> describes it step by step.</p>
   <p>Version 21 was run with 24 keys on the same Latin text (the opening of Isidore’s <em>Etymologiae</em> XVII,
-    38,304 bits). Keys 1–12 were also used during development; keys 13–24 never were.</p>
+    38,304 bits). Keys 1–12 were also used during development, to choose between variants; keys 13–24 were never used
+    for tuning, only to confirm earlier versions. The project had fixed in advance what an AUC means: 0.6 or less “hard to
+    tell apart”, 0.7 or more “distinguishable”.</p>
   <div class="table-wrap"><table>
     <tr><th>measure</th><th>keys 13–24 (fresh)</th><th>all 24 keys</th></tr>
     <tr><td>judge 1 (AUC; 209 page features)</td><td>0.554</td><td>0.554 ± 0.004</td></tr>
@@ -115,19 +119,30 @@
   </table></div>
   <p>To read these numbers, the real manuscript was degraded on purpose and judged in the same way. With its lines
     shuffled within each page it scores 0.48 and 0.60; with its words shuffled within each line, 0.98 and 0.99. For the
-    second judge the generated books are therefore at the level of the real text without its line order. They always
+    second judge the generated books are therefore at the level of the real text without its line order, but the book of
+    one key in two is above 0.60 (14 of 24). As controls, the same judges tell Currier’s languages A and B apart with AUC
+    1.000, and give 0.53 and 0.52 with random labels. The generated books always
     miss the page profile (how far each page departs from its section) and usually the spelling choices that vary from
     line to line, the register of the first lines of paragraphs and the spread of word lengths; their lines are too
     irregular in width. These judges do not look at the vocabulary: one that checked whether each word occurs in the
     manuscript would separate the books at once, since invented words never do. For reference, the published generators
     pass from 1 to 10 of the 18 properties of the same scorecard.</p>
+  <p><strong>What the generator does not do.</strong> It writes only running paragraph text: no labels, no circular or
+    radial text, no drawings (this site places the real ones next to the generated pages). It does not model the hands, and
+    it writes each page on its own, so the bifolium effects described below are absent. It copies from the line above by
+    the position of a word in the line, not by its physical place; the closure of the line at a drawing and the drift
+    along the line were not targeted. And it hides that there is a message, not that the program was used: about 86% of
+    the running words of a book are Voynich words, the rest are invented, and a book can be recognised as the program’s
+    output.</p>
   <p><strong>With and without a message.</strong> For each key a second book was written with filler bits only. Against
     the manuscript the two kinds score the same (paired differences −0.009 ± 0.008 and −0.007 ± 0.010), and a classifier
     trained directly to separate their pages (228 features, 9,420 pages) scores AUC 0.506, against 0.511 for a negative
     control. This holds by construction, whatever the judge, as long as the cipher is sound: the message enters only as
     encrypted bits, which no efficient test can tell from the random filler of a book without a message. The security is
-    therefore computational, resting on SHAKE-256 as a pseudorandom generator. The construction is modern (arithmetic
-    coding, current cryptography) and says nothing about how a fifteenth-century writer could have hidden a message.</p>
+    therefore computational, resting on SHAKE-256 as a pseudorandom generator. Two books written with the same key share
+    their layout and can be recognised as twins (a random value per book would remove this, and is not implemented), so
+    each message needs its own key. The construction is modern (arithmetic coding, current cryptography) and says nothing
+    about how a fifteenth-century writer could have hidden a message.</p>
 
   <h2 id="rules">2. The writing rules, measured</h2>
   <p>Each property is measured with its 95% interval (by bifolium) and set against the same measure in the comparison
@@ -138,16 +153,18 @@
     <li><strong>Word form marks the word boundaries.</strong> The next glyph is very predictable (conditional entropy
       2.23 bits, against 2.54–4.65 in the 24 languages); spaces can be predicted from the two glyphs on either side
       (F1 0.86), and cutting the text at other places allowed by the rules mostly yields words attested elsewhere (50%,
-      median 6.5% in languages). Version 1 read this as a sign that the space is a weak boundary inside a chain of
-      glyphs. That reading does not hold: a null model that keeps the word grammar and removes every link between words
-      reproduces all four properties. Boundaries are marked redundantly by the shape of words, as in any script with
-      positional forms.
-      <span class="prior">Described before by Bennett (1976), Lindemann and Bowern (2020), Stolfi (2000), Feaster (2020),
-      Rozanova and Temerev (2026).</span></li>
+      median 6.5% in languages); the vocabulary fills the most probable glyph sequences (43%, median 5%), and frequent
+      words are the most probable ones (rank correlation 0.58, median 0.09). Version 1 read this as a sign that the space
+      is a weak boundary inside a chain of glyphs. That reading does not hold: a null model that keeps the word grammar and
+      removes every link between words reproduces all four properties. Boundaries are marked redundantly by the shape of
+      words, as in any script with positional forms.
+      <span class="prior">Described before by Bennett (1976), Lindemann and Bowern (2020), Stolfi (2000), Zattera (2023),
+      Feaster (2020), Rozanova and Temerev (2026).</span></li>
     <li><strong>Adjacent words are linked, and the link mirrors the rules inside words.</strong> The last glyph of a word
       says a lot about the first glyph of the next: 0.188 bits beyond the shuffle within the line (0.163–0.211), against a
       median of 0.097 in the languages; only Sanskrit and Tagalog, which write phonological links between words, exceed
-      it. Volunteers’ gibberish has 0.014, published generators 0–0.08. The preferences across the space resemble those
+      it. Volunteers’ gibberish has 0.014, published generators 0–0.08 (except <em>voynich-fingerprint</em>, 0.16–0.17).
+      The preferences across the space resemble those
       between consecutive glyphs inside a word (rank correlation 0.47, at most 0.37 in the 24 languages), and this part
       does not follow from word form. Two junction rules: before a gallows a word begins with <code class="eva">qo-</code>
       after <code class="eva">-y</code>, <code class="eva">-o</code>, <code class="eva">-d</code> (59–64%) and with
@@ -155,22 +172,26 @@
       <code class="eva">-m</code> (<code class="eva">qo-</code> only 23–27%); a word ends in <code class="eva">-r</code>
       before <code class="eva">a-</code> (85%) and in <code class="eva">-l</code> before <code class="eva">k-</code>,
       <code class="eva">t-</code>, <code class="eva">d-</code>, <code class="eva">l-</code>, <code class="eva">s-</code>,
-      <code class="eva">q-</code> (63–86%). They hold at every position in the line, in the three main hands, in every
-      section with enough data and in three transliterations, with the shape of rules like English <em>a/an</em> or French
-      <em>liaison</em>. The writing seems to know the next word while finishing the current one (few cases; not robust to
-      the strictest correction), and no further: there is no link with the word after next, which 22 of 24 languages have.
-      <span class="prior">The link was observed by Currier (1976), Smith (2017) and Smith and Ponzi (2019). The mirroring of
-      the rules inside words is added here.</span></li>
+      <code class="eva">q-</code> (63–86%). They hold at each position in the line with enough cases (for
+      <code class="eva">-l/-r</code> only from the fourth word on, and the other positions go the same way), in the three
+      main hands, in every section with enough data and in three transliterations. They have the shape of rules like
+      English <em>a/an</em> or French <em>liaison</em>, and say nothing about the sounds behind them. Where two words copied
+      from the line above would break a rule, the piece that changes is the one that a writer who knows the next word
+      while finishing the current one would change (only 37 and 60 such cases; not robust to the strictest correction).
+      Beyond the next word there is no link at all, whereas 22 of 24 languages have one.
+      <span class="prior">The link was observed by Currier (1976), Smith (2017) and Smith and Ponzi (2019), and the first
+      junction rule was described in part by Currier and Smith. The mirroring of the rules inside words is added
+      here.</span></li>
     <li><strong>The line is a closed unit.</strong> Between the last word of a line and the first of the next the link is
       zero (−0.003 bits), against 0.19 inside the line. In the comparison languages the ratio of the two has a median of
-      0.49 and only Hebrew falls below 0.10, but their lines are those of printed editions, not of manuscripts, so they
-      are a weak reference here. The link also drops where a plant interrupts a
+      0.49 and only Hebrew falls below 0.10, but their lines are those of the source editions, often ending at a clause or
+      a verse, not lines of manuscripts, so they are a weak reference here. The link also drops where a plant interrupts a
       line (from 0.167 to 0.026 bits). Lines have edge forms: for the same rest of the word, at line end
       <code class="eva">-m</code> gains 15 points and <code class="eva">-r</code> loses 12 (<code class="eva">dar</code>
       inside a line, <code class="eva">dam</code> at its end); at line start <code class="eva">s-</code> and
       <code class="eva">y-</code> gain 9–10 points. In the labels of the drawings, which stand alone,
       <code class="eva">qo-</code> before a gallows is almost absent (0–5%, against 30–68% in lines), as predicted from the
-      junction rule before looking. A herbal printed one verse per line closes its lines too: a line that is a unit of
+      junction rule before looking (the fact itself had been noticed by Zandbergen, 2026). A herbal printed one verse per line closes its lines too: a line that is a unit of
       content would do the same.
       <span class="prior">Described before by Currier (1976), Smith (2015–2016), Feaster (2020–2023), Rozanova and Temerev
       (2026); measured here for the same word and against scribes.</span></li>
@@ -178,28 +199,30 @@
       word in the two lines above more often than the vocabulary of the paragraph predicts (<em>z</em> = 17.4), more than
       twice as much as in the generator of Timm and Schinner (2020). The copying comes almost entirely from the line just
       above (in languages recurrence spreads over three or four lines), neighbouring words are copied from neighbouring
-      words in the same order, a copied word takes the form that agrees with its new neighbour (effect +0.49 against
+      words, usually in the same order, a copied word takes the form that agrees with its new neighbour (effect +0.49 against
       +0.16), and copying stops at the paragraph and the page.
       <span class="prior">Observed by Timm (2014); the shape of the copying is added here.</span></li>
     <li><strong>Each line avoids starting like the line above.</strong> Identical starts are 0.51 of the number expected
       (0.40–0.61), strongest for <code class="eva">qo-</code> (<em>z</em> = −9.7) and <code class="eva">o-</code> (−7.0):
       if the line above starts with <code class="eva">qo-</code>, the chance that the next does drops by 52 points. Only
       the left margin matters: not where lines resume to the right of a drawing, not the line two above, not the right
-      margin. The median language has 0.97, gibberish 1.32, generators 0.93–2.05; none of the 79 medieval manuscripts
-      shows it.
+      margin. The median language has 0.97 and one of 23 (Portuguese) falls below the Voynich, but here too languages
+      without physical lines are a weak reference; gibberish has 1.32, generators 0.93–2.05, and none of the 79 medieval
+      manuscripts avoids the margin.
       <span class="prior">A forum study had reported vertical avoidance of the same glyph in the herbal pages of one scribe
       (tavie, Voynich Ninja, 2024); measured here across the manuscript and against comparison texts.</span></li>
     <li><strong>Choices between variant forms follow a short state.</strong> Many words come in pairs that differ by one
-      glyph (<code class="eva">k/t</code>, <code class="eva">sh/ch</code>, <code class="eva">-ey/-dy</code>). Nearby
-      words repeat the same choice more than each word’s own preferences predict: +0.132 between adjacent words
+      glyph (<code class="eva">k/t</code>, <code class="eva">sh/ch</code>, <code class="eva">-ey/-dy</code>); treating
+      them as variant forms of one word is a working hypothesis, not a result. Nearby words repeat the same choice more than each word’s own preferences predict: +0.132 between adjacent words
       (0.111–0.153), +0.091 at two and three words, halving in about three words. The agreement is almost the same between
       very different words as between similar ones, it is not an effect of position, it is separate for each choice and
       the same in hands 1–3, in languages A and B and in three transliterations. Agreement of this size exists in
-      languages as grammatical agreement (Italian <em>-o/-a</em>), so it does not set the Voynich apart from a language;
-      in the scribes it is weaker or absent, but not established as unique (below). A slower state that crosses the line
-      break is normal in handwriting.
-      <span class="prior">Local clustering of similar forms was noted by Timm (2014) and Schinner (2007); the short,
-      word-independent state was not found described before.</span></li>
+      languages as grammatical agreement (Italian <em>-o/-a</em>), so it does not set the Voynich apart from a language
+      with agreement; in the manuscripts compared it is weaker or absent, but not established as unique (below). A slower
+      state that crosses the line break is normal in handwriting.
+      <span class="prior">Local clustering of similar forms was noted by Timm (2014) and Schinner (2007), and a switch after
+      <code class="eva">ch/sh</code> that holds for whole folios by Parisel (2026); the short, word-independent state was
+      not found described before.</span></li>
     <li><strong>Marked variants drift along the line.</strong> For the same word, <code class="eva">qo</code>,
       <code class="eva">k</code>, <code class="eva">sh</code> and <code class="eva">-ey</code> become rarer towards the
       right: −0.020 to −0.034 per ten glyphs, about 8–13 points over a line of median length. It is clearest for
@@ -209,12 +232,14 @@
       same word and against scribes.</span></li>
     <li><strong>Immediate repetition is not avoided.</strong> One adjacent pair in a hundred is the same word repeated
       (<code class="eva">chol chol</code>), 3.9% nearly identical. Against the composition of each line the Voynich repeats
-      the previous word as often as chance (ratio 1.04), whereas every comparison text avoids it: languages 0.01–0.92,
+      the previous word as often as chance (ratio 1.04), whereas every comparison language and manuscript avoids it:
+      languages 0.01–0.92,
       Nordic scribes 0.02–0.07, German manuscripts at most 0.79, the Copiale copyist 0. Fifteenth-century German herbals,
       recipe books and astrology texts avoid it too (0.05–0.51), so it does not come from genre. Version 1 read this as
       repetition beyond chance; the corrected reading is that it is not avoided, and that repeated words cluster in the
       same line.
-      <span class="prior">The rate was measured by Boxer (2023) and by Bowern and Lindemann (2021).</span></li>
+      <span class="prior">The rate was measured by Boxer (2023) and by Bowern and Lindemann (2021). That it is not avoided,
+      unlike in every language and manuscript compared, is added here.</span></li>
     <li><strong>The book has a writing structure.</strong> 83% of paragraphs open with a gallows (<code class="eva">p</code>
       in 54%), a mark of position more than of the word; first and last lines have their own register;
       <code class="eva">-ey</code> rises by 12 points (7–18) from top to bottom of the page; each page departs from its
@@ -241,7 +266,7 @@
       <code class="eva">s-</code> +0.098</td><td>+0.012 to +0.025 (abbreviations, line-break hyphen)</td><td>same kind,
       4–8 times stronger in the Voynich</td></tr>
     <tr><td>immediate repetition (observed / expected in the line)</td><td>1.04</td><td>Nordic 0.02–0.07; German at most
-      0.79; Copiale 0</td><td>avoided by every scribe</td></tr>
+      0.79; Copiale 0</td><td>avoided in every manuscript</td></tr>
     <tr><td>drift along the line (per ten glyphs)</td><td>−0.020 to −0.034</td><td>at most 0.008, in no common
       direction</td><td>absent with power in 20 of 29 choices</td></tr>
     <tr><td>short state of choices (2–3 words)</td><td>+0.09</td><td>absent with power in 14 of 29 choices; power
@@ -260,17 +285,20 @@
     controls, never reliably beats the negative controls on the Voynich. The published readings that could be tested
     (Bax 2014, Vatne 2021, Cheshire 2019, Schechter 2026, Gatta 2026) do not pass their controls; applying a reading to a
     text generated without content is proposed as a minimum test for any announced decipherment. Historical mechanisms
-    were simulated one at a time, each test first checked on texts enciphered on purpose: homophones chosen by the
-    copyist would leave a negative agreement between nearby words (the Voynich has a positive one); no word or sign behaves
-    like the index letters of Alberti’s cipher disk; a message in the binary choices, as in Bacon’s biliteral cipher,
-    restarting at each page or line, is absent (a continuous one is beyond the reach of the test); Trithemius’ word tables
-    leave no rhythm; an autokey restarting at each line closes the line like the Voynich, but destroys repetition and
-    inflates the vocabulary.</p>
-  <p><strong>Generators.</strong> No constructed language has the junction rules, the line properties or the agreement
-    between adjacent word forms. Volunteers’ gibberish has none of them. Among the published generators measured, none
-    combines the junction, the closed line and the margin avoidance. <em>voynich-fingerprint</em> (Sachak, 2026), which
-    reproduces 44 statistics on held-out folios, has the junction and its mirroring of the rules inside words, but not the closed line, the margin avoidance,
-    the line-final forms, the copying from the line above or the short state.</p>
+    were simulated one at a time, each test first checked on texts enciphered on purpose. Several of them are later than
+    the vellum, so these are tests of a kind of mechanism, not historical hypotheses: homophones chosen by the copyist
+    would leave a negative agreement between nearby words (the Voynich has a positive one); no frequent word or sign
+    behaves like the index letters of Alberti’s cipher disk; a message in the binary choices, as in Bacon’s biliteral
+    cipher, restarting at each page or line, is absent (a continuous one is beyond the reach of the test); Trithemius’
+    word tables leave no rhythm; an autokey restarting at each line closes the line like the Voynich, but destroys
+    repetition, inflates the vocabulary and leaves no margin avoidance.</p>
+  <p><strong>Generators.</strong> No constructed language has the junction rules, the line properties or an agreement
+    between adjacent word forms like the Voynich’s. Volunteers’ gibberish has no junction, no line-edge forms, no copying
+    from the line above and no margin avoidance. Among the published generators measured, none combines the junction, the
+    closed line and the margin avoidance. <em>voynich-fingerprint</em> (Sachak, 2026), which reproduces 44 statistics on
+    held-out folios, has the junction and its mirroring of the rules inside words and, in two books of three, a drift of
+    <code class="eva">qo-/o-</code> close to the manuscript’s; but its lines are not closed, and it has no margin
+    avoidance, almost no line-final forms, no copying from the line above and no short state.</p>
 
   <h2 id="meaning">4. What it means</h2>
   <p>Two claims must be kept apart. <strong>A book with a message and a book without one</strong> are samples of the same
@@ -278,15 +306,17 @@
     manuscript</strong> are not: the judges separate them a little, several properties are not reproduced, and a stronger
     or independently built judge would probably do better. Together they mean that a text written under the rules
     measured here can carry a message, and that whether it does cannot be read from its statistics. This does not show
-    that the manuscript carries a message, any more than generators without a message show that it does not: the debate
-    between “meaningless” and “enciphered” will not be settled by the statistics of the text alone. What is specific to
+    that the manuscript carries a message, any more than generators without a message show that it does not. It shows,
+    with a construction, what several studies had suspected from the statistics they measured (Gaskell and Bowern 2023;
+    Bowern and Gaskell 2023; Parisel 2026; Rozanova and Temerev 2026): the debate between “meaningless” and “enciphered”
+    will not be settled by the statistics of the text alone. What is specific to
     the Voynich here is not the indistinguishability, which any cover would give with a good cipher, but the capacity at
     a given distance from the manuscript: about 83,000 bits per book at AUC 0.55 and 0.60 with these judges, a lower
     bound that a better model could raise.</p>
   <p><strong>Not supported</strong>, with the controls described: a natural language in an ordinary alphabet read with a simple
     or homophonic substitution, in the languages tested; the published readings tested; the historical mechanisms
     simulated, one at a time; a text invented by hand without rules; and the idea that the rules are the ordinary habits
-    of the 79 manuscripts measured.</p>
+    of the 79 Nordic and German manuscripts measured (with reservations for the short state).</p>
   <p><strong>Open</strong>, four scenarios the data do not separate: a language written with a very artificial writing
     system (the junction rules are compatible with a phonetically written language); a code or cipher of an untested
     kind, for example with a word repertory or a lost key book; no message, from a procedure that can be executed by
@@ -305,13 +335,17 @@
       timestamps; the programme was exploratory, and confirmations on data not used to form a hypothesis are few.</li>
     <li>Everything rests on transliterations that share the line segmentation; the images were checked only on a
       sample.</li>
-    <li>Comparison manuscripts are Old Norse and Early New High German only; the lines of the 24 languages are those of
-      their source editions, not of manuscripts; only one real enciphered manuscript (the Copiale) was available.</li>
+    <li>Comparison manuscripts are Old Norse and Early New High German only. They are 79 manuscripts, not 79 known
+      scribes: the files do not mark changes of hand, and the 73 German ones were measured together for the state of the
+      choices, so one scribe’s state could be diluted; for the short state the power is insufficient in 13 of 29
+      choices. The lines of the 24 languages are those of their source editions, not of manuscripts. Only one real
+      enciphered manuscript (the Copiale) was available.</li>
     <li>Three planned tests could not be run because their measures did not separate the cases on synthetic texts.</li>
-    <li>The judges and the scorecard are the project’s own and the generator was tuned against them; an independently
-      built judge has not been tried (the books of the 24 keys, the keys and the code are public, and one built by others
-      would be welcome); keys 1–12 were used during development; the encryption has not been reviewed by a
-      cryptographer.</li>
+    <li>The judges and the scorecard are the project’s own, the scorecard bands were set after seeing the results (a
+      specification, not a test), and the generator was tuned against them. An independently built judge has not been
+      tried: the books of the 24 keys, the keys and the code are public, and one built by others would be welcome. Keys
+      1–12 were used during development. The books are not indistinguishable from the manuscript. The encryption has not
+      been reviewed by a cryptographer, and the scrypt salt is fixed.</li>
     <li>Several effects are small in absolute terms (the short state is about 13 points of agreement), and the look-ahead
       and the drift of single choices other than <code class="eva">sh/ch</code> do not survive the strictest multiplicity
       correction.</li>
