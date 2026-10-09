@@ -38,11 +38,13 @@
   <span class="tag" aria-hidden="true">daiin.okal</span>
   <h1>About</h1>
   <p class="lead">The Voynichizer takes any text and a key and writes a second Voynich manuscript: a new book of
-    207 folios with the sections, languages, vocabulary and line structure of Beinecke MS 408, in EVA, the alphabet used
-    to transliterate it, and in a Voynich-like script. With the same key, the hidden text comes back exactly.</p>
+    207 pages, named like the folios of the real one, with the sections, Currier languages, vocabulary and line structure
+    of Beinecke MS 408, in EVA, the alphabet used to transliterate it, and in a Voynich-like script. With the same key, the
+    hidden text comes back exactly.</p>
 
   <p class="colophon-note" id="colophon"><span class="rubric">Colophon.</span> Made by Davide Caniatti in 2026, alongside a
-    statistical study of the Voynich manuscript: first the research, then a generator that writes by the rules it found.
+    statistical study of the Voynich manuscript described in the preprint <a href="research.html"><em>Hiding a Message in
+    a Voynich-like Book</em></a>: first the research, then a generator built on eighteen of the properties it measured.
     The program, its script and this site are free software under the MIT licence. Write to
     <a class="mail" data-u="davide.caniatti" data-d="gmail.com" href="#colophon">davide.caniatti [at] gmail.com</a>.</p>
 
@@ -63,8 +65,9 @@
   <div class="table-wrap"><table>
     <tr><th>measure (version v21, 24 keys)</th><th>value</th></tr>
     <tr><td>judge 1 (glyphs, glyph pairs, words, line edges, vertical similarity)</td><td>0.554 ± 0.004</td></tr>
-    <tr><td>judge 2 (plus: word pairs, position in the line, first lines, page profile)</td><td>0.601 ± 0.005</td></tr>
-    <tr><td>the same two judges on the 12 keys never used to develop the program</td><td>0.554; 0.606</td></tr>
+    <tr><td>judge 2 (plus: word pairs seen elsewhere, identical neighbours, the first and last words of lines, the first
+      lines of paragraphs, how far a page’s glyphs depart from the book and between its two halves)</td><td>0.601 ± 0.005</td></tr>
+    <tr><td>the same two judges on keys 13–24, never used to tune the program or to choose between versions</td><td>0.554; 0.606</td></tr>
     <tr><td>scorecard of 18 properties of the text (17 attainable: the Voynich itself fails one when measured the same way)</td><td>16.0</td></tr>
     <tr><td>8 further properties</td><td>5.4</td></tr>
     <tr><td>line test (five conditions on how lines start, end and follow each other)</td><td>24 keys out of 24</td></tr>
@@ -72,32 +75,45 @@
     <tr><td>lines somewhat wider (over 1.25 times the median; Voynich 6.0%)</td><td>11.6%</td></tr>
     <tr><td>the text comes back exactly; wrong key rejected</td><td>24 of 24; 24 of 24</td></tr>
   </table></div>
-  <p>A manuscript with a message and one without cannot be told apart by these measures, and by construction: the
-    message only replaces the random numbers of one step of the sampling.</p>
+  <p>A manuscript with a message and one without cannot be told apart: a classifier trained directly to separate their
+    pages scores AUC 0.506 (and 0.511 on two sets of books that both lack a message). This holds by construction for any
+    test, as long as the cipher is sound: the encrypted message only takes the place of the filler, a stream of
+    pseudorandom bits, that decides how many times each known word appears on each page.</p>
 
   <h3>What this does not mean</h3>
   <p>It is not “indistinguishable from the Voynich”:</p>
   <ul>
     <li>the second judge still recognises it a little (14 keys of 24 give a manuscript above 0.60);</li>
-    <li>some known properties never come out right: the page profile, the spelling choices that vary by line, the spread
-      of word lengths, the first lines of paragraphs as a register of their own, and the width of the lines (see the
-      table);</li>
-    <li>the model was tuned on the same statistics these judges look at, with the same keys; a judge built independently
-      has not been tried;</li>
-    <li>almost all words are Voynich words: anyone who knows the program can tell that a manuscript was made with the
-      program. What they cannot tell is whether there is a message inside.</li>
+    <li>some known properties are not reproduced: the page profile is always missed; the spelling choices that vary from
+      line to line (23 keys of 24), the spread of word lengths (20 of 24) and the first lines of paragraphs as a register
+      of their own (18 of 24) usually are; and lines are too irregular in width (see the table);</li>
+    <li>it writes only running paragraph text: no labels and no circular or radial text; it does not imitate the
+      different hands, and it writes each page on its own, so what the two halves of a bifolium share in the manuscript is
+      absent;</li>
+    <li>the program was developed against these same instruments (its weights were tuned with seeds and keys of their
+      own, and keys 1–12 were used to choose between versions); a judge built independently has not been tried;</li>
+    <li>about 86% of the running words are Voynich words; the rest are invented and never occur in the manuscript. The
+      judges do not look at the vocabulary: a test that checked whether each word occurs in the manuscript would spot the
+      books at once, and anyone who knows the program can tell that a book was made with it. What they cannot tell is
+      whether there is a message inside.</li>
   </ul>
   <p>Nor does it decipher the Voynich manuscript, or say how it was made: the program imitates its statistics, it does
     not explain it.</p>
 
   <h2>Security</h2>
   <ul>
-    <li>The key goes through scrypt (N = 2<sup>15</sup>, r = 8, p = 1); the compressed text is encrypted with a SHAKE-256
-      keystream and carries a 64-bit HMAC-SHA256 tag: with the wrong key the program answers “wrong key”.</li>
-    <li>These are standard building blocks, but the whole <strong>has not been reviewed by an expert</strong>: do not use
-      it for secrets that matter.</li>
-    <li>The salt is fixed and the keystream depends only on the key: use a long passphrase that is yours alone, and a
-      different key for every message.</li>
+    <li>The passphrase goes through scrypt (N = 2<sup>15</sup>, r = 8, p = 1) to a master key. The compressed text is
+      framed with its length and a 64-bit HMAC-SHA256 tag, and the frame is encrypted with a SHAKE-256 keystream: with the
+      wrong key the program answers “wrong key”. The security is computational: it rests on SHAKE-256 behaving as a
+      pseudorandom generator.</li>
+    <li>These are standard building blocks, but the whole <strong>has not been reviewed by a cryptographer</strong>: do
+      not use it for secrets that matter.</li>
+    <li>The scrypt salt is fixed, so a list of guessed passphrases can be prepared once for all books: use a long random
+      passphrase, six random words or twelve random characters.</li>
+    <li>Every choice of the program derives from the key, so two books written with the same key share their layout and
+      can be recognised as twins (there is no random value per book): use a different key for every book.</li>
+    <li>The book must stay as it is: moving words within a page changes nothing, but adding, removing or changing a word
+      breaks the reading, and there is no error correction.</li>
   </ul>
 
   <h2>Versions</h2>
@@ -108,9 +124,10 @@
     <li>v21 reads manuscripts written by v17 (the first published version) and v20: they differ only in the arrangement of
       the words, which carries no message. Future versions that change the word counts will keep the older versions
       available here for reading.</li>
-    <li>The browser computes with slightly different library versions from a desktop computer. The words on every
-      page are the same; their order within the lines may differ. Either way the text reads back, here or with the
-      command-line program.</li>
+    <li>The browser (Python compiled to WebAssembly) and the command-line program (CPython on Windows) use different
+      mathematical libraries. In our tests the words on every page were the same and only their order within the lines
+      could differ, and reading back worked in both directions. Other machines have not been tested, and the
+      probabilities are computed in floating point.</li>
     <li>The browser lacks one function, <code>hashlib.scrypt</code>: the site supplies it from
       <a href="https://github.com/paulmillr/noble-hashes">noble-hashes</a> 2.4.0, a standard implementation checked
       against the RFC 7914 test vector every time the page starts.</li>

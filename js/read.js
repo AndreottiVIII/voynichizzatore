@@ -24,8 +24,8 @@ function check(text, name) {
     return false;
   }
   status.className = 'file-status ok';
-  status.textContent = '✓ ' + (name ? name + ': ' : 'Pasted text: ') + 'a manuscript of ' + pages.length + ' folios and ' +
-    lines.toLocaleString('en') + ' lines' + (pages.length === PAGES ? '' : ' (a whole book has ' + PAGES + ' folios: some are missing)') +
+  status.textContent = '✓ ' + (name ? name + ': ' : 'Pasted text: ') + 'a manuscript of ' + pages.length + (pages.length === 1 ? ' page and ' : ' pages and ') +
+    lines.toLocaleString('en') + ' lines' + (pages.length === PAGES ? '' : ' (a whole book has ' + PAGES + ' pages: some are missing)') +
     '. Now give its key.';
   return true;
 }
@@ -112,7 +112,7 @@ async function technical(text, manuscript, info, ms) {
   } catch (e) { /* not available */ }
   const rows = [
     ['text', n([...text].length) + ' characters, ' + n(new TextEncoder().encode(text).length) + ' bytes in UTF-8'],
-    ['manuscript', n(folios.size) + ' folios, ' + n(lines.length) + ' lines'],
+    ['manuscript', n(folios.size) + ' pages, ' + n(lines.length) + ' lines'],
     ['checks passed', 'length of the frame, 64-bit HMAC tag, zlib decompression'],
     ['time to read', (ms / 1000).toFixed(1) + ' s'],
     ['program', info.version + ' (commit ' + String(info.commit || '').slice(0, 7) + '), Pyodide ' + info.pyodide],

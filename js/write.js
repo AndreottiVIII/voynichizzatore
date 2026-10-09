@@ -59,9 +59,10 @@ $('text').addEventListener('input', () => {
   estimateTimer = setTimeout(estimate, 300);
 });
 // The limit is in bits, not characters: the text becomes UTF-8 bytes, is compressed with zlib (level 9) and framed
-// with 12 bytes; a book carries 80,000-85,000 bits depending on the key. Once the program has loaded, the size is
+// with 12 bytes; a book carries about 80,000-86,000 bits (81,100-85,900 over the paper's 24 keys), depending on the key
+// and slightly on the message. Once the program has loaded, the size is
 // computed exactly with the program's own zlib; before, it is estimated with the browser's compressor.
-const HINT = 'The limit is in bits, not characters: about 10,000 bytes once compressed, i.e. some 20,000–25,000 ' +
+const HINT = 'The limit is in bits, not characters: about 10,000 bytes once compressed, i.e. roughly 20,000 ' +
   'characters of ordinary prose, more if the text is repetitive, fewer in scripts that take more bytes per character.';
 let engineReady = false;
 async function estimate() {
@@ -87,7 +88,7 @@ async function estimate() {
   const share = bits / CAPACITY;
   hint.textContent = n(chars) + ' characters · ' + n(utf8) + ' bytes in UTF-8 · ' + (exact ? '' : 'about ') + n(compressed) +
     ' bytes compressed → ' + (exact ? '' : 'about ') + n(bits) + ' bits, ' + Math.max(1, Math.round(100 * share)) +
-    '% of the 80,000–85,000 bits a book carries' +
+    '% of the roughly 80,000–86,000 bits a book carries' +
     (bits > CAPACITY_MAX ? ': too long, please shorten it' : bits > CAPACITY ? ': it may not fit, depending on the key' : '');
   hint.classList.toggle('bad', bits > CAPACITY);
 }
@@ -100,7 +101,7 @@ $('form').addEventListener('submit', async (e) => {
   const text = $('text').value;
   const key = $('key').value;
   if (!empty && !text.trim()) return error($('error'), 'Write a text first, or choose a book with no message.');
-  if (key.length < 8) return error($('error'), 'The key is too short: use at least 8 characters (a long passphrase is much better).');
+  if (key.length < 8) return error($('error'), 'The key is too short: use at least 8 characters; a long random passphrase (six random words or twelve random characters) is much better.');
   error($('error'), '');
   await write(empty ? null : text, key, $('want-pdf').checked);
 });
@@ -126,8 +127,8 @@ async function write(text, key, wantPdf) {
       caption('The scribe reads your text…');
       const { bits } = await call('bits', { text, key });
       if (bits > CAPACITY_MAX) {
-        throw new Error('too long for this book: it needs ' + bits.toLocaleString('en') + ' bits, a book carries 80,000 to ' +
-          '85,000 depending on the key (shorten it by about ' + Math.ceil(100 * (1 - CAPACITY / bits)) + '%)');
+        throw new Error('too long for this book: it needs ' + bits.toLocaleString('en') + ' bits, a book carries about 80,000 to ' +
+          '86,000 depending on the key (shorten it by about ' + Math.ceil(100 * (1 - CAPACITY / bits)) + '%)');
       }
       if (bits > CAPACITY) caption('A long text: whether it fits depends on the key. The scribe will know in a minute…');
     }
@@ -200,7 +201,7 @@ function finish(out, info, wantPdf, ms, started) {
       ' bits the book carries (' + Math.max(1, Math.round(100 * i.bit_messaggio / i.capacita_bit)) + '%); the rest is ' +
       'filler, so nobody can see where the message ends.'
     : 'A book with no message: every word is filler.';
-  $('summary').textContent = pages.length + ' folios, ' + lines.toLocaleString('en') + ' lines, written in ' + minutes(ms) +
+  $('summary').textContent = pages.length + ' pages, ' + lines.toLocaleString('en') + ' lines, written in ' + minutes(ms) +
     ' with version ' + info.version + '. ' + used;
   $('dl-txt').href = book.txtUrl;
   technical(out, info, pages, started);
@@ -234,7 +235,7 @@ async function makePdf(b) {
     $('dl-pdf').href = b.pdfUrl;
     $('dl-pdf').hidden = false;
     $('pdf-note').textContent = b.pages.length + ' pages, ' + (blob.size / 1048576).toFixed(1) +
-      ' MB, with the drawings of the Voynich. For looking at, not for reading back.';
+      ' MB, with real drawings of the Voynich (not generated). For looking at, not for reading back.';
   } catch (err) {
     $('pdf-note').textContent = 'The PDF could not be made: ' + err.message;
   }
@@ -288,10 +289,10 @@ async function technical(out, info, pages, t) {
     ['text', i.byte_testo ? n(i.byte_testo) + ' bytes in UTF-8' : 'none (a book with no message)'],
     ['compressed (zlib, level 9)', i.byte_compressi ? n(i.byte_compressi) + ' bytes' : '–'],
     ['encrypted frame (length 4 bytes, tag 8 bytes, data)', i.bit_messaggio ? n(i.bit_messaggio) + ' bits' : '0 bits'],
-    ['capacity of this book (depends on the key)', n(i.capacita_bit) + ' bits'],
+    ['capacity of this book (depends on the key, and slightly on the message)', n(i.capacita_bit) + ' bits'],
     ['share used by the message', (100 * i.bit_messaggio / i.capacita_bit).toFixed(1) + '%'],
     ['pages carrying the message (the rest: filler)', n(i.pagine_usate) + ' of ' + n(i.pagine)],
-    ['folios; lines; paragraphs; words', pages.length + '; ' + n(pages.reduce((k, p) => k + p.lines.length, 0)) + '; ' + n(paras) + '; ' + n(words)],
+    ['pages; lines; paragraphs; words', pages.length + '; ' + n(pages.reduce((k, p) => k + p.lines.length, 0)) + '; ' + n(paras) + '; ' + n(words)],
     ['time: word counts; arrangement; check', s(t.choose, t.arrange) + '; ' + s(t.arrange, t.check || t.end) + '; ' + s(t.check, t.end)],
     ['program', info.version + ' (commit ' + String(info.commit || '').slice(0, 7) + '), Pyodide ' + info.pyodide],
     ['SHA-256 of the manuscript file', '<code>' + sha + '</code>'],
@@ -322,7 +323,7 @@ async function drawIllustrated(page) {
     c.setAttribute('role', 'img');
     box.append(c);
   }
-  c.setAttribute('aria-label', 'Folio ' + page.folio + ' of the generated book, with its drawing');
+  c.setAttribute('aria-label', 'Folio ' + page.folio + ' of the generated book, with a drawing from the real manuscript');
   const w = Math.max(200, box.clientWidth);
   c.width = Math.round(w * (window.devicePixelRatio || 1));
   c.height = Math.round(c.width * PAGE.h / PAGE.w);

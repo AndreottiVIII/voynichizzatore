@@ -40,15 +40,16 @@
       <span class="tag" aria-hidden="true">okeeody.qokain</span>
       <h1>Write a second Voynich</h1>
       <p class="lead">The Voynichizer writes a <em>second Voynich manuscript</em>. Give it a text and a key: it composes a
-        new book of 207 folios, page by page, with the vocabulary, the word shapes, the lines, the paragraphs and the
-        sections of the real one, a Voynich II made to be indistinguishable from the original. Hidden in its word
-        counts is your text: with the same key it comes back exactly; without it, there is nothing to read.</p>
+        new book of 207 pages, named like the folios of the real one, with its vocabulary, word shapes, lines,
+        paragraphs and sections: a Voynich II that aims to be indistinguishable from the original, and is measured
+        against it (see the note at the bottom). Hidden in its word counts is your text: with the same key it comes back
+        exactly; without it, there is nothing to read.</p>
 
       <form id="form" novalidate>
         <div class="field">
           <label for="text">Your text</label>
           <textarea id="text" spellcheck="false" placeholder="Write or paste any text, in any language."></textarea>
-          <div class="hint" id="text-hint">The limit is in bits, not characters: about 10,000 bytes once compressed, i.e. some 20,000–25,000 characters of ordinary prose, more if the text is repetitive, fewer in scripts that take more bytes per character.</div>
+          <div class="hint" id="text-hint">The limit is in bits, not characters: about 10,000 bytes once compressed, i.e. roughly 20,000 characters of ordinary prose, more if the text is repetitive, fewer in scripts that take more bytes per character.</div>
         </div>
         <div class="field">
           <label for="key">Key</label>
@@ -56,8 +57,9 @@
             <input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="A long passphrase">
             <button type="button" class="btn secondary small" id="show-key" aria-pressed="false">Show</button>
           </div>
-          <div class="hint" id="key-hint">Use a long passphrase, four words or more. Without it the text cannot be read
-            back, and nobody can recover it for you.</div>
+          <div class="hint" id="key-hint">Use a long random passphrase, six random words or twelve random characters,
+            and a different one for every book. Without it the text cannot be read back, and nobody can recover it for
+            you.</div>
         </div>
         <div class="field">
           <span class="label">The book</span>
@@ -65,12 +67,15 @@
             <span>The manuscript as EVA text (<code>.txt</code>), always: it is the file you need to read the text back.</span></label>
           <label class="check"><input type="checkbox" id="want-pdf" checked>
             <span>Also the illustrated book, as a PDF: your manuscript written on vellum in a Voynich-like script,
-              among the drawings of the real Voynich.</span></label>
+              around real drawings lifted from the Voynich (the folio’s own, or one from the same section when it has
+              none). The drawings are not generated, and the text is running paragraphs only, with no labels or circular
+              text.</span></label>
         </div>
         <details>
           <summary>More options</summary>
           <label class="check"><input type="checkbox" id="empty">
-            <span>A book with no message (the text is ignored). It cannot be told apart from a book that carries one.</span></label>
+            <span>A book with no message (the text is ignored). Without the key it cannot be told apart from a book that
+              carries one: a classifier trained to separate them scores AUC 0.506, that is, it guesses.</span></label>
         </details>
         <div class="actions"><button class="btn" id="go" type="submit">Write the manuscript</button></div>
         <div class="message error" id="error" role="alert" hidden></div>
