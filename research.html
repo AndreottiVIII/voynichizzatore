@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Voynichizer · Research</title>
-<meta name="description" content="The Voynich Manuscript as a Writing System: reproducible measurements against natural languages, medieval scribes, historical ciphers and text generators. Preprint, version 1.">
+<meta name="description" content="Hiding a Message in a Voynich-like Book: the manuscript's writing rules, measured against languages and medieval scribes, and reproduced by a steganographic generator. Preprint, version 2.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Voynichizer">
 <meta property="og:title" content="Voynichizer · Research">
-<meta property="og:description" content="The Voynich Manuscript as a Writing System: reproducible measurements against natural languages, medieval scribes, historical ciphers and text generators. Preprint, version 1.">
+<meta property="og:description" content="Hiding a Message in a Voynich-like Book: the manuscript's writing rules, measured against languages and medieval scribes, and reproduced by a steganographic generator. Preprint, version 2.">
 <meta property="og:url" content="https://andreottiviii.github.io/voynichizzatore/research.html">
 <meta property="og:image" content="https://andreottiviii.github.io/voynichizzatore/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -33,53 +33,292 @@
   <div class="spread">
   <div class="text">
   <span class="tag" aria-hidden="true">shedy.qokedy</span>
-  <h1>The Voynich Manuscript as a Writing System</h1>
-  <p class="subtitle">Reproducible measurements against natural languages, medieval scribes, historical ciphers and text
-    generators</p>
-  <p class="byline">Davide Caniatti <span class="aff">(independent researcher)</span> and Claude
-    <span class="aff">(Anthropic)</span><br>
-    <span class="note">Preprint, version 1, October 2026. Not peer reviewed. © 2026 the authors, licensed under
+  <h1>Hiding a Message in a Voynich-like Book</h1>
+  <p class="subtitle">The manuscript’s writing rules, measured against languages and medieval scribes, and reproduced by
+    a steganographic generator</p>
+  <p class="byline">Davide Caniatti <span class="aff">(independent researcher)</span><br>
+    <span class="note">Preprint, version 2, October 2026. Not peer reviewed. © 2026 Davide Caniatti, licensed under
     <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.</span></p>
 
   <div class="download paper">
-    <div><strong>The paper</strong><p class="note">PDF, 170 KB, in English. CC BY 4.0.</p></div>
-    <a class="btn" href="research/Caniatti_Claude_2026_Voynich_writing_system_v1.pdf" download>Download the PDF</a>
+    <div><strong>The paper</strong><p class="note" id="paper-size">PDF, in English. CC BY 4.0.</p></div>
+    <a class="btn" href="research/Caniatti_2026_Hiding_a_message_in_a_Voynich-like_book_v2.pdf" download>Download the PDF</a>
   </div>
+  <p class="note paper-links">The research record, with every preregistration, program, result and the laboratory
+    notebook: <a href="https://github.com/AndreottiVIII/voynich-research">github.com/AndreottiVIII/voynich-research</a>.
+    Earlier version: <a href="research/Caniatti_Claude_2026_Voynich_writing_system_v1.pdf" download>Version 1</a>
+    (PDF, October 2026).</p>
 
-  <h2>Abstract</h2>
+  <nav class="toc" aria-label="On this page">
+    <a href="#abstract">Abstract</a> · <a href="#generator">The generator</a> · <a href="#rules">The writing rules</a> ·
+    <a href="#comparisons">Comparisons</a> · <a href="#meaning">What it means</a> · <a href="#limits">Limitations</a> ·
+    <a href="#record">The research record</a> · <a href="#cite">How to cite</a>
+  </nav>
+
+  <h2 id="abstract">Abstract</h2>
   <div class="abstract">
-    <p>The Voynich manuscript (Yale, Beinecke MS 408) is written in a script that has never been read. We do not propose a decipherment. Instead, we describe <em>how</em> the text is written, using more than six hundred preregistered, reproducible experiments, each first validated on synthetic texts in which the effect is known to be present or absent, and replicated on three independent transliterations. We then compare every property with the same measurement on about one hundred natural languages, eight constructed languages, handwritten gibberish produced by volunteers, published Voynich-like generators and ciphers, the eighteenth-century Copiale cipher, and—for the first time in a systematic way—79 real medieval scribes: six Nordic manuscripts (c. 1200–1550) and 73 German manuscripts (1350–1500) transcribed at the level of letter forms, with their original lines and pages.</p>
-    <p><strong>New findings.</strong> (1) The text behaves as a <em>chain of glyphs</em> in which the space is a weak boundary: spaces are predictable from the two surrounding glyphs, re-cutting the chain at other permitted points mostly yields words attested elsewhere, and the rules linking the end of one word to the start of the next mirror the rules inside words more than in any of 71 languages. (2) Adjacent words are linked by <em>junction rules</em> (<code class="eva">qo-</code> after <code class="eva">-y/-o/-d</code>, <code class="eva">o-</code> after <code class="eva">-n/-r/-s/-m</code>; <code class="eva">-l/-r</code> chosen by the next word), applied while writing and looking exactly one word ahead. (3) The <em>line is a closed unit</em>: the junction stops at the line break and at the gap left by a drawing, and line starts and ends have their own forms. (4) The scribe <em>copies from the line immediately above</em>, adapting the copies to the junction rules. (5) Each line <em>avoids starting like the line above</em>. (6) Binary choices between variant forms (<code class="eva">k/t</code>, <code class="eva">sh/ch</code>, <code class="eva">-ey/-dy</code>) follow a <em>short-lived state</em> that persists for two to three words regardless of which word is written; it is not copying, not position, separate for each choice, and identical across scribal hands—a rule of the system. (7) Marked variants <em>drift</em> towards simpler forms along the line. Two further properties are quantified anew: immediate repetition of the previous word (1.0% of adjacent pairs; 3.9% with one glyph changed) and a strong page, bifolium and paragraph structure.</p>
-    <p><strong>Comparisons.</strong> Junction rules, left-margin avoidance, line-edge forms, in-line drift and immediate repetition have no counterpart in the 79 scribes (they are absent or three to a hundred times weaker), and the short state of the choices was found in none of them in the Voynich's form; the Copiale copyist does the opposite of the Voynich, rotating homophones between adjacent words. A slower state crossing line breaks, by contrast, is normal in real scribes. No substitution reading in tens of languages, none of the published readings we could test (Bax, Vatne, Cheshire, Schechter, Gatta), none of the simulated historical mechanisms (homophone choice, Alberti's index letters, Bacon's biliteral cipher, Trithemius' word tables, a line-restarting autokey), no constructed language and no published generator reproduces these properties together.</p>
-    <p><strong>Conclusion.</strong> The Voynich text is the product of a writing system with rules between neighbouring words and at line edges far stronger than those of any scribe, language or generator we tested. These rules do not reveal what the text says, but they exclude many explanations and provide a checklist that any future proposal must reproduce.</p>
+    <p>We studied how the text of the Voynich manuscript (Beinecke MS 408) is written, in 716 logged experiments, 670 of
+      them preregistered: hypothesis and criterion were fixed before the run, the code was tested first on synthetic
+      texts, and each finding was set against the same measurement in 24 natural languages, constructed languages,
+      volunteers’ gibberish, published generators and ciphers and, where scribal habits were at issue, 79 medieval
+      manuscripts (six Nordic, 73 German).</p>
+    <p>The measurements quantify regularities described before (word boundaries marked redundantly by word form, the
+      dependency between adjacent words and its stop at the line break, line-edge forms, paragraph-initial gallows,
+      copying from the line above) and add some that, to our knowledge, are new: the dependency between adjacent words
+      mirrors the glyph sequences inside words; immediate repetition is not avoided, unlike in every language and
+      manuscript compared; each line avoids starting like the line above, and marked variants drift along the line,
+      both beyond anything in the medieval scribes measured. Eighteen of the measured properties form a scorecard.</p>
+    <p>From the scorecard we built the <em>voynichizer</em>, which hides any text of up to about 20,000 characters in a
+      Voynich-like book of 207 pages. The text is compressed, encrypted and authenticated with a key; through an
+      arithmetic decoder its bits decide only how many times each recurring Voynich word appears on each page, while
+      layout, invented words and word order follow the measured rules. On 24 keys, two classifiers retrained on each book
+      separate its pages from the real ones with AUC 0.55 and 0.60 (0.5 is chance; the second gives 0.60 also to the real
+      manuscript with its lines shuffled), and the books pass 16 of the 17 attainable scorecard properties.</p>
+    <p>That a Voynich-like text can carry a real message had been shown at the level of words, most fully by the Naibbe
+      cipher (Greshko, 2025). We demonstrate it again, with a different mechanism and two stricter conditions: the book
+      also follows the line, paragraph and page rules, and a book with a message is a sample of the same distribution as
+      a book without one (a classifier trained to tell them apart scores AUC 0.51), while the key recovers the text
+      exactly. The regularities we measured therefore describe how the manuscript was written, but they cannot tell
+      whether it contains a message: a text that follows them can carry one or not, and the two cases look the same.</p>
   </div>
 
-  <h2>Key findings</h2>
-  <p>The first seven findings are, to our knowledge, <strong>new</strong>; the last three strengthen earlier ideas with new measurements.</p>
+  <h2 id="question">The question</h2>
+  <p>A century of proposed readings has not produced one that scholars accept, and the debate has narrowed to a question
+    that statistics seems well placed to answer: is the text a meaningful message (a language, perhaps enciphered) or the
+    meaningless product of a procedure? The paper asks whether regularities, however many and however strong, can decide
+    it at all. Steganography gives the answer in principle: if texts with and without a message are samples of the same
+    distribution, no test on the text can tell them apart (Cachin, 1998). The question then becomes constructive: can one
+    build a book that follows the measured writing rules of the Voynich, at the level of the line, the paragraph and the
+    page as well as the word, and that carries a message or not, with the two cases indistinguishable by construction?</p>
+
+  <h2 id="generator">1. The generator: a Voynich-like book that carries a message</h2>
+  <p>The voynichizer, which this site runs, turns any text of up to about 20,000 characters into a 207-page book in EVA
+    transliteration and gives it back exactly with the key. The text is compressed, encrypted and authenticated; its bits
+    drive an arithmetic decoder that samples how many times each recurring Voynich word occurs on each page. Everything
+    else (layout, invented words, word order) follows the manuscript’s statistics and carries no information. The method
+    of feeding encrypted bits to an arithmetic decoder to sample from a model is that of Ziegler, Deng and Rush (2019);
+    what is new is a cover model of one whole historical book, evaluated against the measured properties of that book.
+    <a href="how.html">How it works</a> describes it step by step.</p>
+  <p>Version 21 was run with 24 keys on the same Latin text (the opening of Isidore’s <em>Etymologiae</em> XVII,
+    38,304 bits). Keys 1–12 were also used during development; keys 13–24 never were.</p>
+  <div class="table-wrap"><table>
+    <tr><th>measure</th><th>keys 13–24 (fresh)</th><th>all 24 keys</th></tr>
+    <tr><td>judge 1 (AUC; 209 page features)</td><td>0.554</td><td>0.554 ± 0.004</td></tr>
+    <tr><td>judge 2 (AUC; 228 page features)</td><td>0.606</td><td>0.601 ± 0.005</td></tr>
+    <tr><td>scorecard properties passed (of 17 attainable)</td><td>15.9</td><td>16.0</td></tr>
+    <tr><td>extra properties passed (of 8)</td><td>5.2</td><td>5.4</td></tr>
+    <tr><td>line gate passed</td><td>12 of 12</td><td>24 of 24</td></tr>
+    <tr><td>text read back exactly; wrong key rejected</td><td>12; 12</td><td>24; 24</td></tr>
+  </table></div>
+  <p>To read these numbers, the real manuscript was degraded on purpose and judged in the same way. With its lines
+    shuffled within each page it scores 0.48 and 0.60; with its words shuffled within each line, 0.98 and 0.99. For the
+    second judge the generated books are therefore at the level of the real text without its line order. They always
+    miss the page profile (how far each page departs from its section) and usually the spelling choices that vary from
+    line to line, the register of the first lines of paragraphs and the spread of word lengths; their lines are too
+    irregular in width.</p>
+  <p><strong>With and without a message.</strong> For each key a second book was written with filler bits only. Against
+    the manuscript the two kinds score the same (paired differences −0.009 ± 0.008 and −0.007 ± 0.010), and a classifier
+    trained directly to separate their pages (228 features, 9,420 pages) scores AUC 0.506, against 0.511 for a negative
+    control. This holds by construction, whatever the judge, as long as the cipher is sound: the message enters only as
+    encrypted bits, which look like the random filler of a book without a message.</p>
+
+  <h2 id="rules">2. The writing rules, measured</h2>
+  <p>Each property is measured with its 95% interval (by bifolium) and set against the same measure in the comparison
+    texts. The paper says, property by property, what was known before; many of these regularities were. What the
+    project adds is to quantify them with the same code against the same comparison texts, and a few properties not
+    found in the literature.</p>
   <ol class="findings">
-    <li><strong>The text is a chain of glyphs in which the space is a weak boundary.</strong> The rules linking the last glyph of a word to the first glyph of the next mirror the rules between two glyphs inside a word more than in any of 71 comparison languages. Spaces can be predicted from the two surrounding glyphs (accuracy 0.86, above 97% of languages), and cutting the text at other points allowed by the rules mostly yields words attested elsewhere in the manuscript (50%, against 6.5% in languages).</li>
-    <li><strong>Adjacent words are linked by junction rules.</strong> <code class="eva">qo-</code> follows words ending in <code class="eva">-y</code>, <code class="eva">-o</code>, <code class="eva">-d</code>; <code class="eva">o-</code> follows <code class="eva">-n</code>, <code class="eva">-r</code>, <code class="eva">-s</code>, <code class="eva">-m</code>. A final <code class="eva">-l</code> or <code class="eva">-r</code> depends on how the next word begins. The scribe <em>knows the next word</em> while finishing the current one. The link is about four times stronger than in the strongest of the medieval scribes we tested.</li>
-    <li><strong>The line is a closed unit.</strong> The link between words stops at the line break and also where a drawing interrupts the line; line starts and ends have their own forms (at line end <code class="eva">-m</code> replaces <code class="eva">-r</code>; at line start <code class="eva">s-</code> and <code class="eva">y-</code> appear).</li>
-    <li><strong>The scribe copies from the line immediately above.</strong> Words reproduce, more than chance, words or pieces of line from the line just written, not from lines further up; the copy is adapted to the junction rules with its new neighbour.</li>
-    <li><strong>Each line avoids starting like the line above.</strong> If the line above begins with <code class="eva">qo-</code>, the line below begins with <code class="eva">o-</code>. None of 79 medieval scribes does this: not a single case in 72 tests on the six Nordic scribes, and only three of 73 German manuscripts avoid one single initial, as expected by chance.</li>
-    <li><strong>Choices between variant forms follow a “state” lasting a few words.</strong> Between the forms <code class="eva">k/t</code>, <code class="eva">sh/ch</code>, <code class="eva">-ey/-dy</code>, the scribe tends to repeat the same choice for two or three words, <em>whatever word is being written</em>. It is not copying of similar words, not position in the line, it is separate for each choice and identical in all the hands of the manuscript: a rule of the writing system. We did not find it in any of the 79 medieval scribes (six Nordic, 73 German) nor in the Copiale copyist.</li>
-    <li><strong>Marked variants drift along the line</strong> (<code class="eva">qo</code>, <code class="eva">k</code>, <code class="eva">sh</code>, <code class="eva">-ey</code> become rarer from left to right), three to fifteen times more than in the six Nordic scribes and about four times more than in the 73 German ones, whose small drifts follow no common direction.</li>
-    <li><strong>The Voynich repeats the previous word immediately</strong> (1.0% of adjacent pairs) or a nearly identical one (3.9%), more than every language and every one of the 85 handwritten texts we tested (usually 10 to 100 times more), while having a vocabulary of normal size.</li>
-    <li><strong>The book has a writing structure</strong>: each page has a strong identity, the bifolium is a working unit (one Currier “language” and almost always one hand), the paragraph opens with a large sign (<code class="eva">p</code>) and has first and last lines with their own register; <code class="eva">-ey</code> increases down the page.</li>
-    <li><strong>No proposed reading survives the controls</strong>: neither ours (substitutions in dozens of languages, solvers, verbose ciphers, nomenclators, content-guided searches) nor the published ones we could test (Bax, Vatne, Cheshire, Schechter, Gatta), nor the historical cipher mechanisms we simulated (homophones, Alberti's index, Bacon's biliteral cipher, Trithemius' word lists, autokey).</li>
+    <li><strong>Word form marks the word boundaries.</strong> The next glyph is very predictable (conditional entropy
+      2.23 bits, against 2.54–4.65 in the 24 languages); spaces can be predicted from the two glyphs on either side
+      (F1 0.86), and cutting the text at other places allowed by the rules mostly yields words attested elsewhere (50%,
+      median 6.5% in languages). Version 1 read this as a sign that the space is a weak boundary inside a chain of
+      glyphs. That reading does not hold: a null model that keeps the word grammar and removes every link between words
+      reproduces all four properties. Boundaries are marked redundantly by the shape of words, as in any script with
+      positional forms.
+      <span class="prior">Described before by Bennett (1976), Lindemann and Bowern (2020), Stolfi (2000), Feaster (2020),
+      Rozanova and Temerev (2026).</span></li>
+    <li><strong>Adjacent words are linked, and the link mirrors the rules inside words.</strong> The last glyph of a word
+      says a lot about the first glyph of the next: 0.188 bits beyond the shuffle within the line (0.163–0.211), against a
+      median of 0.097 in the languages; only Sanskrit and Tagalog, which write phonological links between words, exceed
+      it. Volunteers’ gibberish has 0.014, published generators 0–0.08. The preferences across the space resemble those
+      between consecutive glyphs inside a word (rank correlation 0.47, at most 0.37 in the 24 languages), and this part
+      does not follow from word form. Two junction rules: before a gallows a word begins with <code class="eva">qo-</code>
+      after <code class="eva">-y</code>, <code class="eva">-o</code>, <code class="eva">-d</code> (59–64%) and with
+      <code class="eva">o-</code> after <code class="eva">-n</code>, <code class="eva">-r</code>, <code class="eva">-s</code>,
+      <code class="eva">-m</code> (<code class="eva">qo-</code> only 23–27%); a word ends in <code class="eva">-r</code>
+      before <code class="eva">a-</code> (85%) and in <code class="eva">-l</code> before <code class="eva">k-</code>,
+      <code class="eva">t-</code>, <code class="eva">d-</code>, <code class="eva">l-</code>, <code class="eva">s-</code>,
+      <code class="eva">q-</code> (63–86%). They hold at every position in the line, in the three main hands, in every
+      section with enough data and in three transliterations, with the shape of rules like English <em>a/an</em> or French
+      <em>liaison</em>. The writing seems to know the next word while finishing the current one (few cases; not robust to
+      the strictest correction), and no further: there is no link with the word after next, which 22 of 24 languages have.
+      <span class="prior">The link was observed by Currier (1976), Smith (2017) and Smith and Ponzi (2019). The mirroring of
+      the rules inside words is added here.</span></li>
+    <li><strong>The line is a closed unit.</strong> Between the last word of a line and the first of the next the link is
+      zero (−0.003 bits), against 0.19 inside the line; in the comparison languages, with prose cut into lines, the ratio
+      of the two has a median of 0.49 and only Hebrew falls below 0.10. The link also drops where a plant interrupts a
+      line (from 0.167 to 0.026 bits). Lines have edge forms: for the same rest of the word, at line end
+      <code class="eva">-m</code> gains 15 points and <code class="eva">-r</code> loses 12 (<code class="eva">dar</code>
+      inside a line, <code class="eva">dam</code> at its end); at line start <code class="eva">s-</code> and
+      <code class="eva">y-</code> gain 9–10 points. In the labels of the drawings, which stand alone,
+      <code class="eva">qo-</code> before a gallows is almost absent (0–5%, against 30–68% in lines), as predicted from the
+      junction rule before looking. A herbal printed one verse per line closes its lines too: a line that is a unit of
+      content would do the same.
+      <span class="prior">Described before by Currier (1976), Smith (2015–2016), Feaster (2020–2023), Rozanova and Temerev
+      (2026); measured here for the same word and against scribes.</span></li>
+    <li><strong>The scribe copies from the line immediately above.</strong> A word has an identical or nearly identical
+      word in the two lines above more often than the vocabulary of the paragraph predicts (<em>z</em> = 17.4), more than
+      twice as much as in the generator of Timm and Schinner (2020). The copying comes almost entirely from the line just
+      above (in languages recurrence spreads over three or four lines), neighbouring words are copied from neighbouring
+      words in the same order, a copied word takes the form that agrees with its new neighbour (effect +0.49 against
+      +0.16), and copying stops at the paragraph and the page.
+      <span class="prior">Observed by Timm (2014); the shape of the copying is added here.</span></li>
+    <li><strong>Each line avoids starting like the line above.</strong> Identical starts are 0.51 of the number expected
+      (0.40–0.61), strongest for <code class="eva">qo-</code> (<em>z</em> = −9.7) and <code class="eva">o-</code> (−7.0):
+      if the line above starts with <code class="eva">qo-</code>, the chance that the next does drops by 52 points. Only
+      the left margin matters: not where lines resume to the right of a drawing, not the line two above, not the right
+      margin. The median language has 0.97, gibberish 1.32, generators 0.93–2.05; none of the 79 medieval manuscripts
+      shows it.
+      <span class="prior">A forum study had reported vertical avoidance of the same glyph in the herbal pages of one scribe
+      (tavie, Voynich Ninja, 2024); measured here across the manuscript and against comparison texts.</span></li>
+    <li><strong>Choices between variant forms follow a short state.</strong> Many words come in pairs that differ by one
+      glyph (<code class="eva">k/t</code>, <code class="eva">sh/ch</code>, <code class="eva">-ey/-dy</code>). Nearby
+      words repeat the same choice more than each word’s own preferences predict: +0.132 between adjacent words
+      (0.111–0.153), +0.091 at two and three words, halving in about three words. The agreement is almost the same between
+      very different words as between similar ones, it is not an effect of position, it is separate for each choice and
+      the same in hands 1–3, in languages A and B and in three transliterations. Agreement of this size exists in
+      languages as grammatical agreement (Italian <em>-o/-a</em>), so it does not set the Voynich apart from a language;
+      in the scribes it is weaker or absent, but not established as unique (below). A slower state that crosses the line
+      break is normal in handwriting.
+      <span class="prior">Local clustering of similar forms was noted by Timm (2014) and Schinner (2007); the short,
+      word-independent state was not found described before.</span></li>
+    <li><strong>Marked variants drift along the line.</strong> For the same word, <code class="eva">qo</code>,
+      <code class="eva">k</code>, <code class="eva">sh</code> and <code class="eva">-ey</code> become rarer towards the
+      right: −0.020 to −0.034 per ten glyphs, about 8–13 points over a line of median length. It is clearest for
+      <code class="eva">sh/ch</code> (<em>z</em> = −6.3); the other three go the same way but each alone does not pass the
+      strictest multiplicity correction. The medieval scribes drift at most 0.008 per ten glyphs, in no common direction.
+      <span class="prior">The rightward indices of Feaster (2021–2023) describe the same tendency; measured here for the
+      same word and against scribes.</span></li>
+    <li><strong>Immediate repetition is not avoided.</strong> One adjacent pair in a hundred is the same word repeated
+      (<code class="eva">chol chol</code>), 3.9% nearly identical. Against the composition of each line the Voynich repeats
+      the previous word as often as chance (ratio 1.04), whereas every comparison text avoids it: languages 0.01–0.92,
+      Nordic scribes 0.02–0.07, German manuscripts at most 0.79, the Copiale copyist 0. Fifteenth-century German herbals,
+      recipe books and astrology texts repeat 7–30 times less, so it does not come from genre. Version 1 read this as
+      repetition beyond chance; the corrected reading is that it is not avoided, and that repeated words cluster in the
+      same line.
+      <span class="prior">The rate was measured by Boxer (2023) and by Bowern and Lindemann (2021).</span></li>
+    <li><strong>The book has a writing structure.</strong> 83% of paragraphs open with a gallows (<code class="eva">p</code>
+      in 54%), a mark of position more than of the word; first and last lines have their own register;
+      <code class="eva">-ey</code> rises by 12 points (7–18) from top to bottom of the page; each page departs from its
+      section 2.8 times more than chance. The bifolium is a unit: a page shares its identity with the conjugate leaf, which
+      in the bound book can lie far away, and not with the facing page (<em>z</em> = 6.6); the two halves share rare words
+      and copy from each other; all 48 bifolia with enough labelled pages are in one Currier language, 94% of 52 in one
+      hand. Languages A and B differ in vocabulary, not in glyphs: B is not A enciphered with another key.
+      <span class="prior">Paragraph gallows: Currier (1976), D’Imperio (1978) and others; hands following the bifolia in the
+      herbal section: Davis (2025). The shared rare words and the copying between conjugate leaves are added here.</span></li>
   </ol>
 
-  <h2>The research and the Voynichizer</h2>
-  <p>The Voynichizer grew out of this research. Its generator writes by the regularities the paper measures (the
-    vocabulary of each section, the shape of the words, the edges of the lines, the links between neighbouring words,
-    the line copied from the line above) and is judged by the same statistics; <a href="how.html#second">How it works</a>
-    lists them one by one, with how close the generated book comes. Like the paper, it reads nothing in the Voynich:
-    it imitates how the text is written, not what it says.</p>
+  <h2 id="comparisons">3. Against languages, medieval scribes, ciphers and generators</h2>
+  <p>If these rules were ordinary scribal habits, real scribes copying real texts would have them. The same properties
+    were measured, with the same code, in 79 manuscripts transcribed at the level of letter forms with their original lines
+    and pages: six Nordic manuscripts of about 1200–1550 (Menota) and 73 German manuscripts of 1350–1500, the area and
+    century of the Voynich (Reference Corpus of Early New High German).</p>
+  <div class="table-wrap"><table>
+    <tr><th>property</th><th>Voynich</th><th>79 medieval manuscripts</th><th>reading</th></tr>
+    <tr><td>junction rules (effect)</td><td>0.058</td><td>Nordic: 2 of 11 choices at 0.013–0.015; German: 2 of 13 at
+      0.001–0.005; the rest zero</td><td>about 4 times the strongest Nordic choice, 12 times the strongest German</td></tr>
+    <tr><td>avoiding the start of the line above</td><td>5 starts avoided</td><td>none in 72 Nordic tests; 3 of 72 German
+      with one start, as expected by chance</td><td>not found</td></tr>
+    <tr><td>line-edge forms (gain of the most typical form)</td><td>end <code class="eva">-m</code> +0.151; start
+      <code class="eva">s-</code> +0.098</td><td>+0.012 to +0.025 (abbreviations, line-break hyphen)</td><td>same kind,
+      4–8 times stronger in the Voynich</td></tr>
+    <tr><td>immediate repetition (observed / expected in the line)</td><td>1.04</td><td>Nordic 0.02–0.07; German at most
+      0.79; Copiale 0</td><td>avoided by every scribe</td></tr>
+    <tr><td>drift along the line (per ten glyphs)</td><td>−0.020 to −0.034</td><td>at most 0.008, in no common
+      direction</td><td>absent with power in 20 of 29 choices</td></tr>
+    <tr><td>short state of choices (2–3 words)</td><td>+0.09</td><td>absent with power in 14 of 29 choices; not measurable
+      in 13; present in 2 (one uncertain); the Copiale copyist rotates homophones (−0.18)</td><td>weaker or absent; not
+      established as unique</td></tr>
+    <tr><td>slow state between consecutive lines</td><td>+0.050</td><td>6 of 17 choices, 5 as large as the
+      Voynich</td><td>normal in handwriting</td></tr>
+  </table></div>
+  <p>These are Old Norse and Early New High German manuscripts; fifteenth-century Latin or Italian manuscripts transcribed
+    at the level of letter forms, the closest to the Voynich, are not in the battery.</p>
+  <p><strong>Ciphers and readings.</strong> Every negative result here comes from a test that recovers the answer when it
+    is there. Real texts were encoded in many ways (word-for-word codes, 450 verbose ciphers, the Naibbe cipher,
+    abbreviations, nulls, transpositions, encoded lists and prayers): some take on the letters, the vocabulary or the
+    predictability of the Voynich, none its repetitions, page homogeneity, junction and line properties. Homophonic substitution with spaces in 14 languages recovers 69–98% of the words of the controls and at
+    most 36% of Voynich words, mostly the same three; a solver without spaces, recovering 91–100% of its positive
+    controls, never reliably beats the negative controls on the Voynich. The published readings that could be tested
+    (Bax 2014, Vatne 2021, Cheshire 2019, Schechter 2026, Gatta 2026) do not pass their controls; applying a reading to a
+    text generated without content is proposed as a minimum test for any announced decipherment. Historical mechanisms
+    were simulated one at a time, each test first checked on texts enciphered on purpose: homophones chosen by the
+    copyist would leave a negative agreement between nearby words (the Voynich has a positive one); no word or sign behaves
+    like the index letters of Alberti’s cipher disk; a message in the binary choices, as in Bacon’s biliteral cipher,
+    restarting at each page or line, is absent (a continuous one is beyond the reach of the test); Trithemius’ word tables
+    leave no rhythm; an autokey restarting at each line closes the line like the Voynich, but destroys repetition and
+    inflates the vocabulary.</p>
+  <p><strong>Generators.</strong> No constructed language has the junction rules, the line properties or the agreement
+    between adjacent word forms. Volunteers’ gibberish has none of them. Among the published generators measured, none
+    combines the junction, the closed line and the margin avoidance. <em>voynich-fingerprint</em> (Sachak, 2026), which
+    reproduces 44 statistics on held-out folios, has the junction and its mirroring of the rules inside words, but not the closed line, the margin avoidance,
+    the line-final forms, the copying from the line above or the short state.</p>
 
-  <h2>How to cite</h2>
-  <p class="cite">Caniatti, D., &amp; Claude (2026). <em>The Voynich Manuscript as a Writing System: Reproducible
-    measurements against natural languages, medieval scribes, historical ciphers and text generators.</em> Preprint,
-    version 1. CC BY 4.0.</p>
+  <h2 id="meaning">4. What it means</h2>
+  <p>Two claims must be kept apart. <strong>A book with a message and a book without one</strong> are samples of the same
+    distribution: no test on the text can separate them without the key. <strong>A generated book and the real
+    manuscript</strong> are not: the judges separate them a little, several properties are not reproduced, and a stronger
+    or independently built judge would probably do better. Together they mean that a text written under the rules
+    measured here can carry a message, and that whether it does cannot be read from its statistics. This does not show
+    that the manuscript carries a message, any more than generators without a message show that it does not: the debate
+    between “meaningless” and “enciphered” will not be settled by the statistics of the text alone.</p>
+  <p><strong>Excluded</strong>, with the controls described: a natural language in an ordinary alphabet read with a simple
+    or homophonic substitution, in the languages tested; the published readings tested; the historical mechanisms
+    simulated, one at a time; a text invented by hand without rules; and the idea that the rules are the ordinary habits
+    of the 79 manuscripts measured.</p>
+  <p><strong>Open</strong>, four scenarios the data do not separate: a language written with a very artificial writing
+    system (the junction rules are compatible with a phonetically written language); a code or cipher of an untested
+    kind, for example with a word repertory or a lost key book; no message, from a procedure that can be executed by
+    hand, though no generator measured reproduces the junction rules, the closed line and the margin avoidance together;
+    and a line that is a unit of content (a verse, an entry, a recipe), compatible with any of the other three.</p>
+  <p><strong>What would change the conclusions:</strong> a reading that passes these controls (it works on the real text
+    and not on shuffled or generated text, produces meaningful sentences on pages not used to build it, and explains the
+    junction rules, the closed line, the copying and the margin avoidance); a medieval manuscript or historical cipher with
+    the same rules, in particular a fifteenth-century Latin or Italian one; a simple hand procedure that reproduces them
+    all together. A reading will need an external anchor that regularities cannot give: a text of which the manuscript is
+    a copy, a secure identification of many plants, a key found in an archive.</p>
+
+  <h2 id="limits">Limitations</h2>
+  <ul>
+    <li>The preregistrations are internal, dated files in a public version-controlled history, without third-party
+      timestamps; the programme was exploratory, and confirmations on data not used to form a hypothesis are few.</li>
+    <li>Everything rests on transliterations that share the line segmentation; the images were checked only on a
+      sample.</li>
+    <li>Comparison manuscripts are Old Norse and Early New High German only; the 24 languages have lines made by cutting
+      prose; only one real enciphered manuscript (the Copiale) was available.</li>
+    <li>Three planned tests could not be run because their measures did not separate the cases on synthetic texts.</li>
+    <li>The judges and the scorecard are the project’s own and the generator was tuned against them; an independently
+      built judge has not been tried, keys 1–12 were used during development, and the encryption has not been reviewed by
+      a cryptographer.</li>
+    <li>Several effects are small in absolute terms (the short state is about 13 points of agreement), and the look-ahead
+      and the drift of single choices other than <code class="eva">sh/ch</code> do not survive the strictest multiplicity
+      correction.</li>
+  </ul>
+
+  <h2 id="record">The research record</h2>
+  <p>Everything behind the paper is public at
+    <a href="https://github.com/AndreottiVIII/voynich-research">github.com/AndreottiVIII/voynich-research</a>:
+    the preregistrations, the programs, the results with their provenance records, the laboratory notebook (in Italian),
+    the log of all 716 experiments with their outcomes, and the sources of the paper with the script that draws its
+    figures. Seeds are fixed, so re-running an experiment with the same software versions is meant to give the same
+    numbers. Code is under the MIT licence; texts, results and figures under CC BY 4.0. Copyright-protected corpora are
+    not included and must be downloaded from their sources. The notebook also records the provisional readings that later
+    checks corrected.</p>
+
+  <h2 id="cite">How to cite</h2>
+  <p class="cite">Caniatti, D. (2026). <em>Hiding a Message in a Voynich-like Book: the manuscript’s writing rules,
+    measured against languages and medieval scribes, and reproduced by a steganographic generator.</em> Preprint,
+    version 2. CC BY 4.0.</p>
   </div>
     <div class="side">
       <figure class="illus">
