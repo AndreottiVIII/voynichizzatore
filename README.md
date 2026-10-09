@@ -3,7 +3,7 @@
 Takes any text and a key, and writes a "Voynich-like" manuscript in EVA (the alphabet used to transliterate the Voynich
 manuscript, Beinecke MS 408). With the same key, the text comes back exactly.
 
-**Try it in the browser, with nothing to install: https://andreottiviii.github.io/voynichizzatore/**
+**Try it in the browser, with nothing to install: https://voynichizer.com/**
 
     python voynichizzatore.py encode text.txt --key "a long passphrase" --out manuscript.txt
     python voynichizzatore.py decode manuscript.txt --key "a long passphrase" --out text.txt
