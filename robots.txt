@@ -1,0 +1,5 @@
+# The whole site may be crawled.
+User-agent: *
+Allow: /
+
+Sitemap: https://voynichizer.com/sitemap.xml
