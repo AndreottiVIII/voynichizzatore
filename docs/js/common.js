@@ -17,6 +17,12 @@ export function showKey(button, input) {
   });
 }
 
+// Anonymous counting with GoatCounter (no cookies): only the name of what happened is sent, never a text, a key or a
+// manuscript. count.js is loaded by every page and ignores localhost; counting never breaks the page.
+export function count(event, title) {
+  try { window.goatcounter?.count?.({ path: event, title: title || event, event: true }); } catch (e) { /* ignore */ }
+}
+
 export function error(el, text) {
   el.textContent = text;
   el.hidden = !text;
