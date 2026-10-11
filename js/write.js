@@ -3,7 +3,7 @@ import { prepare, call, reset } from './engine.js';
 import { Scribe } from './scribe.js';
 import { parseManuscript, renderPage } from './glyphs.js';
 import { loadAssets, layout, drawPage, makePdf as bookPdf, PAGE } from './book.js';
-import { $, CAPACITY, CAPACITY_MAX, minutes, showKey, error, LOADING, explain } from './common.js';
+import { $, CAPACITY, CAPACITY_MAX, minutes, showKey, error, LOADING, explain, count } from './common.js';
 
 const PAGES = 207;
 // share of the writing time spent in each phase (measured: model 9 s, words 7 s, lines 87 s, check 2 s out of 107)
@@ -213,6 +213,8 @@ function finish(out, info, wantPdf, ms, started) {
   $('folio').replaceChildren(...pages.map((p, k) => new Option(p.folio, String(k))));
   $('scriptorium').hidden = true;
   $('result').hidden = false;
+  count(i.bit_messaggio ? 'book-written' : 'book-written-empty',
+    i.bit_messaggio ? 'A book was written' : 'A book with no message was written');
   show(0);
   $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('pdf-row').hidden = !wantPdf;
@@ -236,6 +238,7 @@ async function makePdf(b) {
     $('dl-pdf').hidden = false;
     $('pdf-note').textContent = b.pages.length + ' pages, ' + (blob.size / 1048576).toFixed(1) +
       ' MB, with real drawings of the Voynich (not generated). For looking at, not for reading back.';
+    count('book-pdf-made', 'An illustrated book was bound');
   } catch (err) {
     $('pdf-note').textContent = 'The PDF could not be made: ' + err.message;
   }

@@ -1,6 +1,6 @@
 // The Read page: manuscript file and key in, text out.
 import { prepare, call } from './engine.js';
-import { $, showKey, error, LOADING, explain } from './common.js';
+import { $, showKey, error, LOADING, explain, count } from './common.js';
 import { parseManuscript } from './glyphs.js';
 
 const PAGES = 207;
@@ -79,10 +79,12 @@ $('form').addEventListener('submit', async (e) => {
     $('dl').download = 'voynich-II_text_' + new Date().toISOString().slice(0, 10) + '.txt';
     $('working').hidden = true;
     $('result').hidden = false;
+    count('text-read', 'A text was read back');
   } catch (err) {
     $('working').hidden = true;
     $('form').hidden = false;
     error($('error'), explain(err.message));
+    if (/wrong key/.test(err.message)) count('read-nothing', 'Reading found nothing (wrong key or no message)');
   }
 });
 
