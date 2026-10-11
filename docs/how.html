@@ -3,15 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Voynichizer · How it works</title>
-<meta name="description" content="How the Voynichizer writes a Voynich-like manuscript and hides a text in it: data, key, encryption, arithmetic coding of word counts, invented words, arrangement, measurements, security and limits.">
+<title>How the Voynichizer works: method, measurements and limits | Voynichizer</title>
+<meta name="author" content="Davide Caniatti">
+<meta name="description" content="How the Voynichizer hides a text in the word counts of a Voynich-like book: compression and encryption, arithmetic coding, the model of the manuscript, the measurements against the real Voynich, security and known limits.">
+<link rel="canonical" href="https://voynichizer.com/how.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Voynichizer">
-<meta property="og:title" content="Voynichizer · How it works">
-<meta property="og:description" content="How the Voynichizer writes a Voynich-like manuscript and hides a text in it: data, key, encryption, arithmetic coding of word counts, invented words, arrangement, measurements, security and limits.">
+<meta property="og:locale" content="en_GB">
+<meta property="og:title" content="How the Voynichizer works: method, measurements and limits | Voynichizer">
+<meta property="og:description" content="How the Voynichizer hides a text in the word counts of a Voynich-like book: compression and encryption, arithmetic coding, the model of the manuscript, the measurements against the real Voynich, security and known limits.">
 <meta property="og:url" content="https://voynichizer.com/how.html">
 <meta property="og:image" content="https://voynichizer.com/preview.jpg">
 <meta property="og:image:secure_url" content="https://voynichizer.com/preview.jpg">
@@ -22,20 +25,21 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://voynichizer.com/preview.jpg">
 <link rel="stylesheet" href="css/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://voynichizer.com/how.html","url":"https://voynichizer.com/how.html","name":"How the Voynichizer works: method, measurements and limits | Voynichizer","description":"How the Voynichizer hides a text in the word counts of a Voynich-like book: compression and encryption, arithmetic coding, the model of the manuscript, the measurements against the real Voynich, security and known limits.","inLanguage":"en","isPartOf":{"@id":"https://voynichizer.com/#sito"},"author":{"@id":"https://voynichizer.com/#autore"}}]}</script>
 </head>
 <body>
 <header class="masthead" id="top">
-  <a class="title" href="./"><span class="mark" aria-hidden="true">daiin</span>Voynichizer</a>
+  <a class="title" href="./"><span class="mark" aria-hidden="true" data-nosnippet>daiin</span>Voynichizer</a>
   <nav aria-label="Pages">
     <a href="./">Write</a><a href="read.html">Read</a><a href="how.html" aria-current="page">How it works</a><a href="research.html">Research</a><a href="about.html">About</a>
   </nav>
 </header>
 
 <main class="folio prose">
-  <div class="folio-no">2r</div>
+  <div class="folio-no" data-nosnippet>2r</div>
   <div class="spread narrow">
   <div class="text">
-  <span class="tag" aria-hidden="true">qokeedy.chol</span>
+  <span class="tag" aria-hidden="true" data-nosnippet>qokeedy.chol</span>
   <h1>How it works</h1>
   <p class="lead">The Voynichizer writes a second Voynich manuscript: a new book of 207 pages with the same folio
     names, sections and Currier languages as the real one, built from its vocabulary and imitating most of the
